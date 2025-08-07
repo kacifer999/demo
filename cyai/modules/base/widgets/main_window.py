@@ -1,0 +1,108 @@
+from pathlib import Path
+
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+from win32api import GetMonitorInfo, MonitorFromPoint
+
+from cyai.settings.path import *
+from cyai.modules.base.widgets import *
+from cyai.modules.base.ui.ui_main_window import UiMainWindow
+
+
+
+# logger = get_root_logger(name='main_window', log_level=logging.INFO)
+
+
+# 主界面类
+class MainWindow(UiMainWindow):
+    """
+    主界面类，继承自QMainWindow类，统筹管理各个模块，对主要事件进行处理
+    """
+    def __init__(self, name="AI-DESKTOP"):
+        super().__init__()
+        self.name = name
+        self.app_version = '1.0.0'
+        self.project_name = None
+        self.project_db = None
+        self.task = None
+        
+        
+        # 获取当前屏幕尺寸  
+        monitor_info = GetMonitorInfo(MonitorFromPoint((0,0)))
+        _, _, work_witdh, work_height= monitor_info.get("Work")
+        # 设置窗口固定大小，不可拖拽变形
+        self.setFixedSize(work_witdh, work_height - 25)
+        self.setWindowState(Qt.WindowMaximized)
+        # 移除窗口标题栏和边框，防止拖动
+        # self.setWindowFlags(Qt.FramelessWindowHint)
+        self.show()
+        self.hide()
+        self.set_window_title()
+
+        # 添加任务管理
+        self.task_panel = TaskPanel(self)
+        
+        # 添加工程管理
+        self.projec_panel = ProjectPanel(self)
+        self.action_project_panel.changed.connect(self.projec_panel.show_project_panel)
+
+        
+        
+
+
+        # 计划队列
+        # self.scheduler = Scheduler(self)
+        # self.progress_bar = ProgressHorizontalBar(self)
+        # self.log_horizontal_bar = LogHorizontalBar(self)
+
+        # Debug
+        # self.debug_console = DebugConsole(self）
+    
+
+    def build_project(self, project_name, new_project = False):
+        self.project_name = project_name
+
+        if project_name is not None:
+            db_dir = Path(BASE_DIR,'projects', project_name,'project.db')
+            self.project_db = connect_db(db_dir.as_posix(), self.project_db)
+            if new_project:
+                self.task_panel.create_first_task()
+
+            self.task = get_active_task()
+            if self.task is not None:
+                pass
+            # task_type = self.scheduler.check_task_in_queue(self.task.uuid)
+            # if isinstance(task_type, list):
+            #     set_task_inactive(self.task)
+            #     self.task = get_active_task()
+            self.task_panel.build_tool_chain()
+            # self.tool_chain_widget.show()
+            # self.set_to_task(self.task)
+        else:
+            self.task = None
+            # self.ui.action_train_procedure_analysis.setEnabled(False)
+            self.task_panel.scene.clear()
+
+        self.set_window_title()
+
+
+    def set_window_title(self):
+        title = f'{self.name} - {self.app_version}'
+        if self.project_name is not None:
+            title += f' - 工程: {self.project_name}' 
+
+        if self.task is not None:
+            title += f' - 任务: {self.task.task_name}' 
+
+        self.setWindowTitle(title)
+
+    def update_task(self, task):
+        if isinstance(task,Task):
+            task = ConfigDict(model_to_dict(task))
+        
+        self.task = task
+
+    def resizeEvent(self, event):
+        # 窗口大小改变时调用
+        return
