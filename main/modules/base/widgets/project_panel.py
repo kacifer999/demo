@@ -1,8 +1,6 @@
 # python packages
-import json
-import logging
+
 import shutil
-import time
 from pathlib import Path
 import types
 
@@ -10,43 +8,51 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-from cyai.settings.path import *
-from cyai.modules.base.service.project_config import ProjectsConfig
-from cyai.modules.base.widgets.messagge_box import MessageBox
-# self packages
-# from cyai.modules.base.ui.project_set import Ui_ProjectSetDialog
-# from cyai.settings.paths import BASE_DIR, THEME_DIR
-# from cyai.modules.base.service.logger import get_root_logger
-# from cyai.modules.base.service.misc import message_box
-# from cyai.modules.base.service.projects import Projects
-# from cyai.modules.base.service.migration import Migration
-# from cyai.modules.base.service.sdk_utils import export_sdk
-# from cyai.modules.base.service.thread_import_project import ImportProjectThread
-# from cyai.modules.base.service.thread_export_project import ExportProjectThread
+from apsw import status
+from mmengine import Config, ConfigDict
+
+from main.settings.path import *
+from main.modules.base.widgets.messagge_box import MessageBox
+
+from main.db.dao.service import *
+
+
 
 
 
 # 工程设置及管理类
-class ProjectPanel(ProjectsConfig):
+class ProjectPanel(object):
     def __init__(self, main_window=None):
         self.main_window = main_window
         self.project_panel = main_window.list_project_panel
-        self.project_panel.mousePressEvent = types.MethodType(self.mouse_press_event, self.project_panel)
-        self.load_projects_config()
-        self.load_projects()
+        self.project_config = self.load_project_config()
+        self.load_project_panel()
+
+
+
+        # self.project_panel.mousePressEvent = types.MethodType(self.mouse_press_event, self.project_panel)
+        self.project_panel.mousePressEvent = self.mouse_press_event
+        # self.load_projects_config()
+        
 
         self.project_panel.itemClicked.connect(self.switch_project)
         self.project_panel.customContextMenuRequested.connect(self.create_menu)
     
 
-    def load_projects(self):
+    def load_project_config(self):
+        if not Path(PROJECTS_CONFIG_DIR).is_file():
+            Config(dict()).dump(PROJECTS_CONFIG_DIR)
+
+        return Config.fromfile(PROJECTS_CONFIG_DIR)
+
+
+    def load_project_panel(self):
         self.project_panel.clear()
-        for project in self.projects:
-            item = self.add_widget_item(project.name)
-            if project.status == "active":
+        for name, status in self.project_config.items():
+            item = self.add_widget_item(name)
+            if status == "active":
                 self.project_panel.setCurrentItem(item)
                 self.main_window.build_project(project.name)
-
 
 
     def show_project_panel(self):
@@ -83,7 +89,9 @@ class ProjectPanel(ProjectsConfig):
         project_name = item.text()
         if item is None: return
         if self.main_window.project_name == project_name: return
-        self.switch(project_name)
+        self.project_config = {name: 'inactive' for name in self.project_config}
+        self.project_config[project_name] = 'active'
+        self.project_config.dump(PROJECTS_CONFIG_DIR)
         self.main_window.build_project(project_name)
 
 
@@ -96,29 +104,42 @@ class ProjectPanel(ProjectsConfig):
             MessageBox(self.main_window, 'information', '提示', msg, QMessageBox.Ok).run()
             return
         
-        if project_name in self.get_project_name_list():
+        if project_name in self.project_config:
             msg = '工程名已经存在，不能新建！'
             MessageBox(self.main_window, 'information', '提示', msg, QMessageBox.Ok).run()
             return
         
-        self.create(project_name)
-        db_dir = Path(BASE_DIR,'projects', project_name,'project.db')
-        db_dir.parent.mkdir(parents=True, exist_ok=True)
-        self.main_window.project_db = connect_db(db_dir.as_posix(), self.main_window.project_db)
-        create_db_tables(self.main_window.project_db)
-        init_data_set_type()
-        self.main_window.build_project(project_name, True)
+        
         item = self.add_widget_item(project_name)
         self.project_panel.setCurrentItem(item)
+        db_dir = Path(BASE_DIR,'projects', project_name,'project.db')
+        db_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        close_db(self.main_window.project_db)
+        self.main_window.project_db = connect_db(db_dir.as_posix())
+        create_db_tables(self.main_window.project_db)
+        init_data_set_type()
+        self.main_window.task_panel.create_task(project_name=project_name, prev_task_name='input')
+        self.project_config = Config({name: 'inactive' for name in self.project_config})
+        self.project_config[project_name] = 'active'
+        self.project_config.dump(PROJECTS_CONFIG_DIR)
+        self.main_window.build_project(project_name)
 
     
     
     def delete_project(self):
         item = self.project_panel.currentItem()
         self.project_panel.takeItem(self.project_panel.row(item))
-        self.main_window.project_db = close_dbs(self.main_window.project_db)
-        self.delete(item.text())
-        shutil.rmtree(Path(BASE_DIR, 'projects', item.text()), ignore_errors=True)
+        self.main_window.project_db = close_db(self.main_window.project_db)
+        project_name = item.text()
+        self.project_config.pop(project_name, None)
+        if len(self.project_config) > 0:
+            name = next(iter(self.project_config.keys()))
+            self.project_config[name] = 'inactive'
+
+        self.project_config.dump(PROJECTS_CONFIG_DIR)
+
+        shutil.rmtree(Path(BASE_DIR, 'projects', project_name), ignore_errors=True)
         self.project_panel.setCurrentItem(None)
         # project_name = self.get_active()
         # if len(self.projects) > 0:
@@ -133,21 +154,16 @@ class ProjectPanel(ProjectsConfig):
         item = QListWidgetItem()
         item.setText(project_name)
         item_width = self.project_panel.geometry().width() - 10
-        item_height = (self.project_panel.geometry().height() - 10)// 15
+        item_height = (self.project_panel.geometry().height() - 10) // 15
         item.setSizeHint(QSize(item_width, item_height))
         item.setIcon(QIcon(Path(ICONS_DIR, 'folder.png').as_posix()))
         self.project_panel.addItem(item)
         return item
-
-
-    
-    def get_project_name_list(self):
-        return [project.name for project in self.projects]
     
 
-    def mouse_press_event(self, project_panel, event):
-        index = project_panel.indexAt(event.pos())
+    def mouse_press_event(self, event):
+        index = self.project_panel.indexAt(event.pos())
         if index.isValid():
-            QListWidget.mousePressEvent(project_panel, event)
+            QListWidget.mousePressEvent(self.project_panel, event)
         else:
-            project_panel.setCurrentItem(None)
+            self.project_panel.setCurrentItem(None)

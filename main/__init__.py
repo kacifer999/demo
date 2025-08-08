@@ -6,7 +6,7 @@ from PySide6.QtWidgets import *
 from qt_material import apply_stylesheet
 
 
-from cyai.modules.base.widgets.main_window import MainWindow
+from main.modules.base.widgets.main_window import MainWindow
 
 def start():
     app = QApplication(sys.argv)

@@ -4,8 +4,9 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 
 class UiProjectPanel(QFrame):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, main_window):
+        super().__init__()
+        self.main_window = main_window
         self.setFrameShape(QFrame.NoFrame)
         self.setFrameShadow(QFrame.Plain)
         self.setStyleSheet("background-color: rgb(127, 127, 127); border: 1px solid rgb(150, 150, 150); border-radius: 0px;")

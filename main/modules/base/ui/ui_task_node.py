@@ -3,8 +3,8 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 class UiTaskNodeWidget(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self):
+        super().__init__()
         self.init_ui()
 
     def init_ui(self):

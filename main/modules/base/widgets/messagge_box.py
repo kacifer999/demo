@@ -5,7 +5,7 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
-from cyai.settings.path import *
+from main.settings.path import *
 
 
 

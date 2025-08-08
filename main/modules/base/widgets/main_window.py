@@ -5,11 +5,10 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from win32api import GetMonitorInfo, MonitorFromPoint
 
-from cyai.settings.path import *
-from cyai.modules.base.widgets import *
-from cyai.modules.base.ui.ui_main_window import UiMainWindow
-
-
+from main.settings.path import *
+from main.modules.base.widgets import *
+from main.modules.base.ui.ui_main_window import UiMainWindow
+from main.db.dao.service import *
 
 # logger = get_root_logger(name='main_window', log_level=logging.INFO)
 
@@ -64,10 +63,11 @@ class MainWindow(UiMainWindow):
         self.project_name = project_name
 
         if project_name is not None:
+            close_db(self.project_db)
             db_dir = Path(BASE_DIR,'projects', project_name,'project.db')
-            self.project_db = connect_db(db_dir.as_posix(), self.project_db)
-            if new_project:
-                self.task_panel.create_first_task()
+            self.project_db = connect_db(db_dir.as_posix())
+            # if new_project:
+            #     self.task_panel.create_first_task()
 
             self.task = get_active_task()
             if self.task is not None:
@@ -76,13 +76,13 @@ class MainWindow(UiMainWindow):
             # if isinstance(task_type, list):
             #     set_task_inactive(self.task)
             #     self.task = get_active_task()
-            self.task_panel.build_tool_chain()
+            # self.task_panel.build_tool_chain()
             # self.tool_chain_widget.show()
             # self.set_to_task(self.task)
         else:
             self.task = None
             # self.ui.action_train_procedure_analysis.setEnabled(False)
-            self.task_panel.scene.clear()
+            # self.task_panel.scene.clear()
 
         self.set_window_title()
 
@@ -98,7 +98,7 @@ class MainWindow(UiMainWindow):
         self.setWindowTitle(title)
 
     def update_task(self, task):
-        if isinstance(task,Task):
+        if isinstance(task, Task):
             task = ConfigDict(model_to_dict(task))
         
         self.task = task
