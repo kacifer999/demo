@@ -1,5 +1,7 @@
-from pathlib import Path
 
+
+from pathlib import Path
+from mmengine import ConfigDict
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
@@ -18,10 +20,9 @@ class MainWindow(UiMainWindow):
     """
     主界面类，继承自QMainWindow类，统筹管理各个模块，对主要事件进行处理
     """
-    def __init__(self, name="AI-DESKTOP"):
+    def __init__(self, name="Demo"):
         super().__init__()
         self.name = name
-        self.app_version = '1.0.0'
         self.project_name = None
         self.project_db = None
         self.task = None
@@ -33,10 +34,7 @@ class MainWindow(UiMainWindow):
         # 设置窗口固定大小，不可拖拽变形
         self.setFixedSize(work_witdh, work_height - 25)
         self.setWindowState(Qt.WindowMaximized)
-        # 移除窗口标题栏和边框，防止拖动
-        # self.setWindowFlags(Qt.FramelessWindowHint)
         self.show()
-        self.hide()
         self.set_window_title()
 
         # 添加任务管理
@@ -76,7 +74,7 @@ class MainWindow(UiMainWindow):
             # if isinstance(task_type, list):
             #     set_task_inactive(self.task)
             #     self.task = get_active_task()
-            # self.task_panel.build_tool_chain()
+            self.task_panel.build_tool_chain()
             # self.tool_chain_widget.show()
             # self.set_to_task(self.task)
         else:
@@ -88,7 +86,7 @@ class MainWindow(UiMainWindow):
 
 
     def set_window_title(self):
-        title = f'{self.name} - {self.app_version}'
+        title = f'{self.name}'
         if self.project_name is not None:
             title += f' - 工程: {self.project_name}' 
 
@@ -98,9 +96,6 @@ class MainWindow(UiMainWindow):
         self.setWindowTitle(title)
 
     def update_task(self, task):
-        if isinstance(task, Task):
-            task = ConfigDict(model_to_dict(task))
-        
         self.task = task
 
     def resizeEvent(self, event):

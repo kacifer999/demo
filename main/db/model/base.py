@@ -6,7 +6,7 @@ DB_PROXY = DatabaseProxy()
 
 class BaseModel(Model):
     uuid = CharField()
-    updated_at = DateTimeField(default=datetime.datetime.now)
+
     class Meta:
         database = DB_PROXY
 

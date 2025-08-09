@@ -52,7 +52,7 @@ class ProjectPanel(object):
             item = self.add_widget_item(name)
             if status == "active":
                 self.project_panel.setCurrentItem(item)
-                self.main_window.build_project(project.name)
+                self.main_window.build_project(name)
 
 
     def show_project_panel(self):
@@ -119,7 +119,7 @@ class ProjectPanel(object):
         self.main_window.project_db = connect_db(db_dir.as_posix())
         create_db_tables(self.main_window.project_db)
         init_data_set_type()
-        self.main_window.task_panel.create_task(project_name=project_name, prev_task_name='input')
+        self.main_window.task_panel.create_task(project_name=project_name, pre_task_name='input')
         self.project_config = Config({name: 'inactive' for name in self.project_config})
         self.project_config[project_name] = 'active'
         self.project_config.dump(PROJECTS_CONFIG_DIR)
