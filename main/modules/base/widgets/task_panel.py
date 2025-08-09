@@ -1,6 +1,6 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from main.settings.path import *
 from main.modules.base.widgets.task_node_widget import TaskNodeWidget
@@ -15,7 +15,8 @@ class TaskPanel(QObject):
         self.widget_task_panel = main_window.widget_task_panel
         self.task_node_dict = dict()
         self.proxy_dict = dict()
-    
+        self.location_list = list()
+
 
     def clear_task_panel(self):
         self.task_node_dict.clear()
@@ -57,9 +58,9 @@ class TaskPanel(QObject):
             if pre_task:
                 pre_task_node = self.task_node_dict[pre_task.task_name]
                 col = pre_task_node.col + 1
-                # 获取前序任务的所有后续任务
-                pre_next_tasks = pre_task_node.next_tasks
-                row = pre_task_node.row + pre_next_tasks.index(task_name)
+                row = pre_task_node.row + pre_task_node.next_tasks.index(task_name)
+                while (row, col) in self.location_list: row += 1
+                self.location_list.append((row, col))
                 task_node.set_location(row, col)
         # 将任务节点添加至画布
         x = 10 + task_node.col * 200

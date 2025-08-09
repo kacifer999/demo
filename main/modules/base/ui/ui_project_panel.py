@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from PySide6.QtWidgets import QFrame, QVBoxLayout, QListWidget
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QFont
+from PyQt5.QtWidgets import QFrame, QVBoxLayout, QListWidget
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 
 class UiProjectPanel(QFrame):
     def __init__(self, main_window):

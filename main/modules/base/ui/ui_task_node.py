@@ -1,6 +1,6 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 class UiTaskNodeWidget(QWidget):
     def __init__(self):
@@ -20,7 +20,8 @@ class UiTaskNodeWidget(QWidget):
         self.label_task_name = QLabel()
         self.label_task_name.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
         self.label_task_name.setText("任务名称")
-        self.label_task_name.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        # self.label_task_name.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.label_task_name.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.main_layout.addWidget(self.label_task_name)
         # 创建按钮布局
         self.layout_buttons = QVBoxLayout()

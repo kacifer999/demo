@@ -1,12 +1,12 @@
 import sys
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-from qt_material import apply_stylesheet
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 
 from main.modules.base.widgets.main_window import MainWindow
+from qt_material import apply_stylesheet
 
 def start():
     app = QApplication(sys.argv)

@@ -2,9 +2,9 @@
 
 from pathlib import Path
 from mmengine import ConfigDict
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 from win32api import GetMonitorInfo, MonitorFromPoint
 
 from main.settings.path import *
