@@ -20,15 +20,15 @@ class UiMenuBar(QMenuBar):
         self.setFont(self.menu_font)
 
         # 创建菜单
-        self.menu_project = QMenu("工程")
+        self.menu_views = QMenu("视图")
         self.init_menu_project()
         self.menu_tools = QMenu("工具")
-        self.menu_views = QMenu("视图")
+        
 
         # 添加菜单到菜单栏
-        self.addAction(self.menu_project.menuAction())
-        self.addAction(self.menu_tools.menuAction())
         self.addAction(self.menu_views.menuAction())
+        self.addAction(self.menu_tools.menuAction())
+        
 
     def init_menu_project(self):
         # 创建动作
@@ -37,7 +37,7 @@ class UiMenuBar(QMenuBar):
         self.main_window.action_project_panel.setChecked(True)
         self.main_window.action_project_panel.setFont(self.action_font)
         self.main_window.action_project_panel.setShortcut("P")
-        self.menu_project.addAction(self.main_window.action_project_panel)
+        self.menu_views.addAction(self.main_window.action_project_panel)
     
     def init_menu_tools(self):
         pass

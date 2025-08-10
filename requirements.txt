@@ -1,5 +1,5 @@
 PyQt5
-qt-material
+qt-material==2.14
 pywin32
 peewee
 apsw

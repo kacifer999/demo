@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 import platform
 from xml.dom.minidom import parse
-# from qt_material.resources import ResourseGenerator
+from qt_material.resources import ResourseGenerator
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -33,7 +33,7 @@ def build_stylesheet(
 
     add_fonts()
     theme = get_theme(theme)
-    # set_icons_theme(theme, parent=parent)
+    set_icons_theme(theme, parent=parent)
 
     # Render custom template
     if os.path.exists(template):
@@ -112,24 +112,24 @@ def get_theme(theme_name):
 
 
 # ----------------------------------------------------------------------
-# def set_icons_theme(theme, parent="theme"):
-#     """"""
-#     source = Path(THEME_DIR, 'svgs')
-#     resources = ResourseGenerator(
-#         primary=theme["primaryColor"],
-#         secondary=theme["secondaryColor"],
-#         disabled=theme["secondaryLightColor"],
-#         source=source,
-#         parent=parent,
-#     )
-#     resources.generate()
+def set_icons_theme(theme, parent="theme"):
+    """"""
+    source = Path(THEME_DIR, 'svgs')
+    resources = ResourseGenerator(
+        primary=theme["primaryColor"],
+        secondary=theme["secondaryColor"],
+        disabled=theme["secondaryLightColor"],
+        source=source,
+        parent=parent,
+    )
+    resources.generate()
 
 
-#     QDir.addSearchPath("icon", resources.index)
-#     QDir.addSearchPath(
-#         "qt_material",
-#         os.path.join(os.path.dirname(__file__), "resources"),
-#     )
+    QDir.addSearchPath("icon", resources.index)
+    QDir.addSearchPath(
+        "qt_material",
+        os.path.join(os.path.dirname(__file__), "resources"),
+    )
 
 
 # ----------------------------------------------------------------------
