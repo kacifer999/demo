@@ -39,11 +39,6 @@ class MainWindow(UiMainWindow):
         self.task_panel = TaskPanel(self)
         # 添加工程管理
         self.project_panel = ProjectPanel(self)
-        self.action_project_panel.changed.connect(self.project_panel.show_project_panel)
-
-        
-        
-
 
         # 计划队列
         # self.scheduler = Scheduler(self)
@@ -52,7 +47,13 @@ class MainWindow(UiMainWindow):
 
         # Debug
         # self.debug_console = DebugConsole(self）
+        self.connect_view_menu_actions()
     
+
+    def connect_view_menu_actions(self):
+        self.action_project_panel.triggered.connect(self.project_panel.show_project_panel)
+        self.action_task_panel.triggered.connect(self.task_panel.show_task_panel)
+
 
     def build_project(self, project_name):
         self.project_name = project_name

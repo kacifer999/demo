@@ -10,15 +10,12 @@ class UiCenterFrame(QFrame):
         self.setFrameShape(QFrame.NoFrame)
         self.setFrameShadow(QFrame.Plain)
         self.setStyleSheet("border: none; border-radius: 0px;")
-        self.init_layout()
-        self.init_widgets()
+        self.init_ui()
 
-    def init_layout(self):
+    def init_ui(self):
         self.layout_center = QVBoxLayout(self)
         self.layout_center.setSpacing(0)
         self.layout_center.setContentsMargins(0, 0, 0, 0)
-
-    def init_widgets(self):
         # 创建任务面板
         self.create_task_panel()
 

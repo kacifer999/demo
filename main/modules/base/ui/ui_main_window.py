@@ -15,6 +15,9 @@ class UiMainWindow(QMainWindow):
         self.resize(1200, 800)
         # 设置窗口为无边框
         self.setWindowFlags(Qt.FramelessWindowHint)
+        self.init_ui()
+    
+    def init_ui(self):
         # 创建窗口控件和布局
         self.window_widget = QWidget()
         self.window_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -34,6 +37,7 @@ class UiMainWindow(QMainWindow):
         self.create_project_panel()
         self.list_project_panel = self.ui_project_panel.list_project_panel
         self.create_center_content()
+        self.ui_task_panel = self.ui_center_frame.frame_task_panel
         self.widget_task_panel = self.ui_center_frame.widget_task_panel
         self.create_view_list_panel()
         # 创建状态栏

@@ -200,3 +200,9 @@ class TaskPanel(object):
         task.is_active = True
         self.main_window.update_task(task)
         QTimer.singleShot(0, self.main_window.build_task)
+    
+    def show_task_panel(self):
+        if self.main_window.action_task_panel.isChecked():
+            self.main_window.ui_task_panel.show()
+        else:
+            self.main_window.ui_task_panel.hide()
