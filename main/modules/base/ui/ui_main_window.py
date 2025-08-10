@@ -10,69 +10,87 @@ from .ui_view_list import UiViewListPanel
 class UiMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        
         # 设置窗口标题和基本属性
         self.setMinimumSize(QSize(1200, 800))
         self.resize(1200, 800)
-        
-        # 创建中心部件和主布局
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-        self.main_layout = QHBoxLayout(self.central_widget)
+        # 设置窗口为无边框
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        # 创建窗口控件和布局
+        self.window_widget = QWidget()
+        self.window_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.setCentralWidget(self.window_widget)
+        self.window_layout = QVBoxLayout(self.window_widget)
+        self.window_layout.setSpacing(0)
+        self.window_layout.setContentsMargins(0, 0, 0, 0)
+        # 创建标题栏
+        self.create_title_bar()
+        # 创建菜单栏
+        self.create_menubar()
+        # 创建所有widget
+        self.main_layout = QHBoxLayout()
         self.main_layout.setSpacing(0)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
-        
-        # 创建菜单栏和状态栏
-        self.create_menubar()
-        self.statusbar = QStatusBar()
-        self.setStatusBar(self.statusbar)
-
-        # 创建所有widget
+        self.window_layout.addLayout(self.main_layout)
         self.create_project_panel()
         self.list_project_panel = self.ui_project_panel.list_project_panel
         self.create_center_content()
         self.widget_task_panel = self.ui_center_frame.widget_task_panel
         self.create_view_list_panel()
-        
+        # 创建状态栏
+        self.statusbar = QStatusBar()
+        self.setStatusBar(self.statusbar)
         # 统一设置尺寸
         self.setup_widget_sizes()
-        
+
+
+    def create_title_bar(self):
+        self.title_bar = QWidget()
+        self.title_bar.setFixedHeight(25)
+        self.window_layout.addWidget(self.title_bar)
+        # 创建标题栏布局
+        layout = QHBoxLayout(self.title_bar)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        # 创建标题标签
+        self.label_title = QLabel()
+        self.label_title.setText("Demo")
+        self.label_title.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        layout.addWidget(self.label_title)
+        # 创建最小化和关闭按钮
+        self.button_minimize = QPushButton("-")
+        self.button_minimize.setFixedSize(23, 23)
+        self.button_minimize.clicked.connect(self.showMinimized)
+        layout.addWidget(self.button_minimize)
+        layout.addItem(QSpacerItem(5, 25, QSizePolicy.Fixed, QSizePolicy.Fixed))
+        self.button_close = QPushButton("×")
+        self.button_close.setFixedSize(23, 23)
+        self.button_close.clicked.connect(self.close)
+        layout.addWidget(self.button_close)
+
         
     def create_menubar(self):
-        # 创建菜单栏
-        self.menubar = UiMenuBar(self)
-
-        self.setMenuBar(self.menubar)
+        self.menu_bar = UiMenuBar(self)
+        self.window_layout.addWidget(self.menu_bar)
         
+
     def create_project_panel(self):
-        # 创建项目面板
         self.ui_project_panel = UiProjectPanel(self)
-        # 添加到主布局
         self.main_layout.addWidget(self.ui_project_panel)
         
         
     def create_center_content(self):
-        # 创建中心内容区域
         self.ui_center_frame = UiCenterFrame(self)
-        # 添加到主布局
         self.main_layout.addWidget(self.ui_center_frame)
 
         
     def create_view_list_panel(self):
-        # 创建视图列表面板
-        self.frame_view_list = UiViewListPanel(self)
-        # 添加到主布局
-        self.main_layout.addWidget(self.frame_view_list)
-        
+        self.ui_view_list = UiViewListPanel(self)
+        self.main_layout.addWidget(self.ui_view_list)
+    
+    
     def setup_widget_sizes(self):
         # 设置主布局拉伸系数 (10%: 80%: 10%)
         self.main_layout.setStretch(0, 1)  # 项目面板
         self.main_layout.setStretch(1, 8)  # 中心面板
         self.main_layout.setStretch(2, 1)  # 视图列表面板
-        
-        # 设置中心内容区域尺寸策略和拉伸系数
         self.ui_center_frame.setup_sizes()
-        
-        # 设置视图列表面板尺寸策略
-        self.frame_view_list.setup_size()
-

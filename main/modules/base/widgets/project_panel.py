@@ -105,7 +105,7 @@ class ProjectPanel(object):
             return
         
         if project_name in self.project_config:
-            msg = '工程名已经存在，不能新建！'
+            msg = '工程名已经存在！'
             MessageBox(self.main_window, 'information', '提示', msg, QMessageBox.Ok).run()
             return
         

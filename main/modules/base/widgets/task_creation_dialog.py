@@ -12,7 +12,6 @@ class CreateTaskDialog(QDialog):
         self.main_window = main_window
         self.setWindowTitle('创建任务')
         self.setMinimumWidth(400)
-        # 只保留标题栏
         self.setWindowFlags(Qt.WindowTitleHint)
         self.task_types = list(TASK_TYPE_LIST)
         self.task_type = ''

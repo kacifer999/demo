@@ -41,7 +41,6 @@ class UiCenterFrame(QFrame):
         # 创建任务面板部件
         self.widget_task_panel = QWidget()
         self.widget_task_panel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        # self.widget_task_panel.setStyleSheet("background-color: rgb(127, 127, 127);")
         self.task_layout.addWidget(self.widget_task_panel)
         # 添加到中心布局
         self.layout_center.addWidget(self.frame_task_panel)

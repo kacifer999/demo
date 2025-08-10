@@ -45,31 +45,7 @@ class MessageBox(QMessageBox):
     def run(self):
         if self.exec():
             return self.clicked_button
-
-
-
-
-
-    # def popup_information(self, inform_type, title, text, buttons, default=QMessageBox.Ok):
-    #     if inform_type == 'information':
-    #         self.setWindowTitle(title)
-    #         self.setWindowIcon(QIcon(Path(ICONS_DIR, 'information.png').as_posix()))
-    #     if inform_type == 'warning':
-            
-    #     self.setText(text)
-    #     self.setStandardButtons(buttons)
-    #     if len(self.buttons()) == 1:
-    #         self.button(QMessageBox.Ok).setText("确定")
-    #         self.button(QMessageBox.Ok).clicked.connect(self.set_ok)
-    #     if len(self.buttons()) == 2:
-    #         self.button(QMessageBox.Ok).setText("确定")
-    #         self.button(QMessageBox.Ok).clicked.connect(self.set_ok)
-    #         self.button(QMessageBox.Cancel).setText("取消")
-    #         self.button(QMessageBox.Cancel).clicked.connect(self.set_cancel)
-    #     self.setStyleSheet("QLabel{min-width: 360px; min-height: 60px; font: 14px;}")
-    #     self.setDefaultButton(default)
-    #     if self.exec():
-    #         return self.clicked_button
+        
 
     def set_ok(self):
         self.clicked_button = QMessageBox.Ok

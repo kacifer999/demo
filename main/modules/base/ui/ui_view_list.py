@@ -16,7 +16,3 @@ class UiViewListPanel(QFrame):
         self.view_list_layout = QVBoxLayout(self)
         self.view_list_layout.setSpacing(0)
         self.view_list_layout.setContentsMargins(0, 0, 0, 0)
-
-    def setup_size(self):
-        # 设置视图列表面板尺寸策略
-        self.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))

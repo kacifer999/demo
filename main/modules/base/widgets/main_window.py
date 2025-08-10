@@ -79,7 +79,8 @@ class MainWindow(UiMainWindow):
         if self.task is not None:
             title += f' - 任务: {self.task.task_name}' 
 
-        self.setWindowTitle(title)
+        # self.setWindowTitle(title)
+        self.label_title.setText(title)
 
     def update_task(self, task):
         self.task = task
