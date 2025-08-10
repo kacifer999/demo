@@ -4,7 +4,6 @@ import os
 import shutil
 from pathlib import Path
 import types
-from mmengine import ConfigDict
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -17,6 +16,9 @@ from main.modules.base.ui.ui_task_node import UiTaskNodeWidget
 
 
 class TaskNodeWidget(UiTaskNodeWidget):
+    signal_add_task = pyqtSignal(str)
+    signal_delete_task = pyqtSignal(str)
+
     def __init__(self, task_panel, task):
         super().__init__()
         self.task_panel = task_panel
@@ -26,6 +28,8 @@ class TaskNodeWidget(UiTaskNodeWidget):
         self.row = 0
         self.col = 0
         self.update_ui()
+        self.button_add.clicked.connect(self.add_task)
+        self.button_delete.clicked.connect(self.delete_task)
 
     
     def update_ui(self):
@@ -41,7 +45,20 @@ class TaskNodeWidget(UiTaskNodeWidget):
         self.col = col
     
 
-    def disconnect(self):
-        self.menu.triggered.disconnect()
+    def add_task(self):
+        self.signal_add_task.emit(self.task_name)
+    
+    def delete_task(self):
+        self.signal_delete_task.emit(self.task_name)
+        
+
+
+    
+
+
+        
+    
+
+    
 
 

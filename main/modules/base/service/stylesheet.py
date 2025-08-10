@@ -5,13 +5,14 @@ import logging
 from pathlib import Path
 import platform
 from xml.dom.minidom import parse
+# from qt_material.resources import ResourseGenerator
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from main.settings.path import THEME_DIR
-TEMPLATE_FILE = Path(THEME_DIR, 'material.css.template')
+TEMPLATE_FILE = Path(THEME_DIR, 'material.qss.template')
 
 
 def apply_stylesheet(
@@ -26,13 +27,13 @@ def apply_stylesheet(
 # ----------------------------------------------------------------------
 def build_stylesheet(
     theme="",
-    invert_secondary=False,
     parent="theme",
     template=TEMPLATE_FILE,
 ):
 
     add_fonts()
-    theme = get_theme(theme, invert_secondary)
+    theme = get_theme(theme)
+    # set_icons_theme(theme, parent=parent)
 
     # Render custom template
     if os.path.exists(template):
@@ -84,7 +85,7 @@ def add_fonts():
 
 # ----------------------------------------------------------------------
 def get_theme(theme_name):
-    theme = os.path.join(os.path.dirname(os.path.abspath(THEME_DIR)), theme_name)
+    theme = os.path.join(THEME_DIR, theme_name)
 
     document = parse(theme)
     theme = {
@@ -108,6 +109,27 @@ def get_theme(theme_name):
     os.environ["QTMATERIAL_THEME"] = theme_name
 
     return theme
+
+
+# ----------------------------------------------------------------------
+# def set_icons_theme(theme, parent="theme"):
+#     """"""
+#     source = Path(THEME_DIR, 'svgs')
+#     resources = ResourseGenerator(
+#         primary=theme["primaryColor"],
+#         secondary=theme["secondaryColor"],
+#         disabled=theme["secondaryLightColor"],
+#         source=source,
+#         parent=parent,
+#     )
+#     resources.generate()
+
+
+#     QDir.addSearchPath("icon", resources.index)
+#     QDir.addSearchPath(
+#         "qt_material",
+#         os.path.join(os.path.dirname(__file__), "resources"),
+#     )
 
 
 # ----------------------------------------------------------------------

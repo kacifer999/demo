@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import *
 
 
 from main.modules.base.widgets.main_window import MainWindow
-from qt_material import apply_stylesheet
+from main.modules.base.service.stylesheet import apply_stylesheet
 
 def start():
     app = QApplication(sys.argv)

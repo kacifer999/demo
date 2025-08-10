@@ -30,6 +30,7 @@ class TaskPanel(QObject):
                                 self.widget_task_panel.height() - 5)
         view = QGraphicsView(self.scene, self.widget_task_panel)
         layout = QVBoxLayout(self.widget_task_panel)
+        view.setStyleSheet("border: none; border-radius: 0px;")
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(view)

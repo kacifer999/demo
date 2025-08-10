@@ -1442,19 +1442,7 @@ QDialog QToolButton:disabled {
 
 
 QMainWindow::separator:vertical,
-QSplitter::handle:horizontal {
-  image: url(icon:/primary/splitter-horizontal.svg);
-}
-
 QMainWindow::separator:horizontal,
-QSplitter::handle:vertical {
-  image: url(icon:/primary/splitter-vertical.svg);
-}
-
-QSizeGrip {
-  image: url(icon:/primary/sizegrip.svg);
-  background-color: transparent;
-}
 
 QMenuBar QToolButton:hover,
 QMenuBar QToolButton:pressed,
