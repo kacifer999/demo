@@ -8,7 +8,7 @@ from main.modules.base.widgets.task_creation_dialog import CreateTaskDialog
 from main.db.dao.service import *
 
 
-class TaskPanel(QObject):
+class TaskPanel(object):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
@@ -19,29 +19,45 @@ class TaskPanel(QObject):
 
 
     def clear_task_panel(self):
-        self.task_node_dict.clear()
-        self.proxy_dict.clear()
+        for task_node in self.task_node_dict.values():
+            task_node.signal_create_task.disconnect()
+            task_node.signal_delete_task.disconnect()
+            task_node.signal_select_task.disconnect()
+            task_node.deleteLater()
+
         if self.widget_task_panel.layout():
             layout = self.widget_task_panel.layout()
             QWidget().setLayout(layout)
+        
+        self.task_node_dict.clear()
+        self.proxy_dict.clear()
+        self.location_list.clear()
         # 初始化图形视图、场景、布局
         self.scene = QGraphicsScene(self.widget_task_panel)
-        self.scene.setSceneRect(0, 0, self.widget_task_panel.width() - 5, 
-                                self.widget_task_panel.height() - 5)
+        # 初始场景大小设为视图大小
+        self.scene.setSceneRect(0, 0, self.widget_task_panel.width() - 10, 
+                                self.widget_task_panel.height() - 10)
+        # 创建视图
         view = QGraphicsView(self.scene, self.widget_task_panel)
-        layout = QVBoxLayout(self.widget_task_panel)
         view.setStyleSheet("border: none; border-radius: 0px;")
+        # 初始设置为不显示滚动条
+        view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # 创建布局并添加视图
+        layout = QVBoxLayout(self.widget_task_panel)
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(view)
+        self.view = view
 
 
-    def build_tool_chain(self):
+    def build_task_panel(self):
         self.clear_task_panel()
         # 获取第一个任务并递归添加
         first_task = get_first_task()
         if first_task:
             self.recursive_add(first_task.task_name)
+
         # 绘制各节点之间的链接线
         self.draw_connections()
 
@@ -49,20 +65,27 @@ class TaskPanel(QObject):
     def recursive_add(self, task_name):
         task = get_task(task_name)
         if task is None: return
+        # 创建任务节点并连接信号
         task_node = TaskNodeWidget(self, task)
+        task_node.signal_create_task.connect(self.create_task)
+        task_node.signal_delete_task.connect(self.delete_task)
+        task_node.signal_select_task.connect(self.select_task)
+        if task.is_active:
+            task_node.setStyleSheet("background-color: rgb(200, 200, 200);")
+
         # 设置任务节点位置
-        if task.toolchain_config.get('pre_task') == 'input':
+        pre_task_name = task.toolchain_config.get('pre_task')
+        if pre_task_name == 'input':
             task_node.set_location(0, 0)
         else:
-            pre_task_name = task.toolchain_config.get('pre_task')
             pre_task = get_task(pre_task_name)
             if pre_task:
                 pre_task_node = self.task_node_dict[pre_task.task_name]
-                col = pre_task_node.col + 1
-                row = pre_task_node.row + pre_task_node.next_tasks.index(task_name)
+                col, row = pre_task_node.col + 1, pre_task_node.row + pre_task_node.next_tasks.index(task_name)
                 while (row, col) in self.location_list: row += 1
                 self.location_list.append((row, col))
                 task_node.set_location(row, col)
+
         # 将任务节点添加至画布
         x = 10 + task_node.col * 200
         y = 10 + task_node.row * 50
@@ -71,6 +94,17 @@ class TaskPanel(QObject):
         # 存储任务节点
         self.task_node_dict[task_name] = task_node
         self.proxy_dict[task_node.task_name]=proxy
+        # 检查是否需要调整场景大小
+        rect = QRectF(0, 0, max(self.scene.width(), x + task_node.width() + 20), 
+                            max(self.scene.height(), y + task_node.height() + 20))
+        if rect != self.scene.sceneRect():
+            self.scene.setSceneRect(rect)
+            # 检查是否需要显示滚动条
+            h_policy = Qt.ScrollBarAlwaysOn if rect.width() > self.view.width() else Qt.ScrollBarAlwaysOff
+            v_policy = Qt.ScrollBarAlwaysOn if rect.height() > self.view.height() else Qt.ScrollBarAlwaysOff
+            self.view.setHorizontalScrollBarPolicy(h_policy)
+            self.view.setVerticalScrollBarPolicy(v_policy)
+        
         # 递归添加后续任务
         for next_task in task_node.next_tasks:
             self.recursive_add(next_task)
@@ -84,9 +118,9 @@ class TaskPanel(QObject):
             from_node = self.task_node_dict[pre_task_name]
             from_proxy = self.proxy_dict[pre_task_name]
             # 计算连接点
-            start_x = from_proxy.x() + from_node.width()
+            start_x = from_proxy.x() + from_node.width() + 1
             start_y = from_proxy.y() + from_node.height() // 2
-            end_x = proxy.x()
+            end_x = proxy.x() - 1
             end_y = proxy.y() + task_node.height() // 2
             # 绘制连接线
             path = QPainterPath()
@@ -96,6 +130,7 @@ class TaskPanel(QObject):
                 path.moveTo(start_x, start_y)
                 path.lineTo(mid_x, start_y)
                 path.lineTo(mid_x, end_y)
+
             path.lineTo(end_x, end_y)
             self.scene.addPath(path, QPen(QColor(93, 71, 139), 2, Qt.SolidLine))
     
@@ -125,6 +160,13 @@ class TaskPanel(QObject):
                 Path(task_dir, 'annotations').mkdir(exist_ok=True)
 
             if pre_task_name == 'input': return
-            update_pre_task(task_name, pre_task_name)
+            change_next_tasks(task_name, pre_task_name)
             self.main_window.update_task(task)
-            self.build_tool_chain()
+            QTimer.singleShot(0, self.main_window.build_task)
+    
+    def delete_task(self, task_name):
+        pass
+    
+    def select_task(self, task_name):
+        pass
+

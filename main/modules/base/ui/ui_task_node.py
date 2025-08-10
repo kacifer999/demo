@@ -11,7 +11,7 @@ class UiTaskNodeWidget(QWidget):
         # 设置窗口属性
         self.setObjectName("TaskNodeWidget")
         self.setGeometry(QRect(0, 0, 150, 40))
-        self.setStyleSheet("background-color: rgb(200, 200, 200);")
+        self.setStyleSheet("background-color: rgb(150, 150, 150);")
         # 创建主水平布局
         self.main_layout = QHBoxLayout(self)
         self.main_layout.setSpacing(0)

@@ -126,7 +126,7 @@ class ProjectPanel(object):
         self.main_window.build_project(project_name)
 
     
-    
+    # TODO
     def delete_project(self):
         item = self.project_panel.currentItem()
         self.project_panel.takeItem(self.project_panel.row(item))

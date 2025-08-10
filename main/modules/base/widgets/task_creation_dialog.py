@@ -12,6 +12,8 @@ class CreateTaskDialog(QDialog):
         self.main_window = main_window
         self.setWindowTitle('创建任务')
         self.setMinimumWidth(400)
+        # 只保留标题栏
+        self.setWindowFlags(Qt.WindowTitleHint)
         self.task_types = list(TASK_TYPE_LIST)
         self.task_type = ''
         self.task_name = ''
@@ -55,10 +57,12 @@ class CreateTaskDialog(QDialog):
         if not self.task_name:
             MessageBox(self.main_window, 'warning', '警告', '任务名称不能为空！', QMessageBox.Ok).run()
             self.line_edit_task_name.clear()
+            self.raise_()
             return
         if self.task_name in get_task_name_list():
             MessageBox(self.main_window, 'warning', '警告', '任务名称已存在！', QMessageBox.Ok).run()
             self.line_edit_task_name.clear()
+            self.raise_()
             return
         
         self.accept()

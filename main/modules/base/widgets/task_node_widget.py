@@ -10,25 +10,25 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 from main.settings.path import *
-from main.modules.base.widgets.messagge_box import MessageBox
 from main.modules.base.ui.ui_task_node import UiTaskNodeWidget
 
 
-
 class TaskNodeWidget(UiTaskNodeWidget):
-    signal_add_task = pyqtSignal(str)
+    signal_create_task = pyqtSignal(str, str)
     signal_delete_task = pyqtSignal(str)
+    signal_select_task = pyqtSignal(str)
 
     def __init__(self, task_panel, task):
         super().__init__()
         self.task_panel = task_panel
+        self.main_window = task_panel.main_window
         self.task_name = task.task_name
         self.pre_task = task.toolchain_config.get('pre_task')
         self.next_tasks = task.toolchain_config.get('next_tasks')
         self.row = 0
         self.col = 0
         self.update_ui()
-        self.button_add.clicked.connect(self.add_task)
+        self.button_add.clicked.connect(self.create_task)
         self.button_delete.clicked.connect(self.delete_task)
 
     
@@ -45,11 +45,17 @@ class TaskNodeWidget(UiTaskNodeWidget):
         self.col = col
     
 
-    def add_task(self):
-        self.signal_add_task.emit(self.task_name)
+    def create_task(self):
+        self.signal_create_task.emit(self.main_window.project_name, self.task_name)
+
     
     def delete_task(self):
         self.signal_delete_task.emit(self.task_name)
+    
+    def mouseDoubleClickEvent(self, a0):
+        self.signal_select_task.emit(self.task_name)
+
+        
         
 
 

@@ -10,8 +10,9 @@ from qt_material import apply_stylesheet
 
 def start():
     app = QApplication(sys.argv)
-    window = MainWindow()
     apply_stylesheet(app, theme='dark_teal.xml')
+    window = MainWindow()
     window.show()
     window.raise_()
+
     sys.exit(app.exec())

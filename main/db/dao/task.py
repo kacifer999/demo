@@ -14,12 +14,6 @@ def get_task_name_list():
 def set_task_inactive():
     Task.update(is_active=False).where(Task.is_active == True).execute()
 
-def update_pre_task(task_name, old_pre_task_name=None, new_pre_task_name=None):
-    if old_pre_task_name:
-        change_next_tasks(task_name, old_pre_task_name, remove=True)
-
-    if new_pre_task_name:
-        change_next_tasks(task_name, new_pre_task_name)
 
 def change_next_tasks(task_name, pre_task_name, remove=False):
     pre_task = get_task(pre_task_name)

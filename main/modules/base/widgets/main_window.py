@@ -26,23 +26,20 @@ class MainWindow(UiMainWindow):
         self.project_name = None
         self.project_db = None
         self.task = None
-        
-        
         # 获取当前屏幕尺寸  
         monitor_info = GetMonitorInfo(MonitorFromPoint((0,0)))
-        _, _, work_witdh, work_height= monitor_info.get("Work")
+        work_width, work_height = monitor_info.get("Work")[2:4]
         # 设置窗口固定大小，不可拖拽变形
-        self.setFixedSize(work_witdh, work_height - 25)
+        self.setFixedSize(work_width, work_height - 25)
         self.setWindowState(Qt.WindowMaximized)
         self.show()
+        self.hide()
         self.set_window_title()
-
         # 添加任务管理
         self.task_panel = TaskPanel(self)
-        
         # 添加工程管理
-        self.projec_panel = ProjectPanel(self)
-        self.action_project_panel.changed.connect(self.projec_panel.show_project_panel)
+        self.project_panel = ProjectPanel(self)
+        self.action_project_panel.changed.connect(self.project_panel.show_project_panel)
 
         
         
@@ -57,31 +54,20 @@ class MainWindow(UiMainWindow):
         # self.debug_console = DebugConsole(self）
     
 
-    def build_project(self, project_name, new_project = False):
+    def build_project(self, project_name):
         self.project_name = project_name
-
         if project_name is not None:
             close_db(self.project_db)
             db_dir = Path(BASE_DIR,'projects', project_name,'project.db')
             self.project_db = connect_db(db_dir.as_posix())
-            # if new_project:
-            #     self.task_panel.create_first_task()
-
-            self.task = get_active_task()
-            if self.task is not None:
-                pass
-            # task_type = self.scheduler.check_task_in_queue(self.task.uuid)
-            # if isinstance(task_type, list):
-            #     set_task_inactive(self.task)
-            #     self.task = get_active_task()
-            self.task_panel.build_tool_chain()
-            # self.tool_chain_widget.show()
-            # self.set_to_task(self.task)
+            self.build_task()
         else:
-            self.task = None
-            # self.ui.action_train_procedure_analysis.setEnabled(False)
-            # self.task_panel.scene.clear()
+            self.task_panel.clear_task_panel()
 
+    
+    def build_task(self):
+        self.task = get_active_task()
+        self.task_panel.build_task_panel()
         self.set_window_title()
 
 
@@ -101,3 +87,4 @@ class MainWindow(UiMainWindow):
     def resizeEvent(self, event):
         # 窗口大小改变时调用
         return
+

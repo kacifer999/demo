@@ -12,6 +12,4 @@ SCRIPTS_DIR = Path(RESOURCES_DIR, 'scripts').as_posix()
 
 ICONS_DIR = Path(RESOURCES_DIR, 'icons').as_posix()
 
-THEME_DIR = Path(RESOURCES_DIR, 'themes').as_posix()
-
 PROJECTS_CONFIG_DIR = Path(BASE_DIR, 'projects', 'projects.json').as_posix()
