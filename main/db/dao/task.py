@@ -34,6 +34,11 @@ def change_next_tasks(task_name, pre_task_name, remove=False):
 def get_first_task():
     return next((task for task in Task.select() if task.toolchain_config.get('pre_task') == 'input'), None)
 
+# TODO
+def delete_task_dbs(task):
+    task.delete_instance()
+
+
 
 
 

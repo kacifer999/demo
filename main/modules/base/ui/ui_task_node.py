@@ -11,11 +11,10 @@ class UiTaskNodeWidget(QWidget):
         # 设置窗口属性
         self.setObjectName("TaskNodeWidget")
         self.setGeometry(QRect(0, 0, 150, 40))
-        self.setStyleSheet("background-color: rgb(150, 150, 150);")
         # 创建主水平布局
         self.main_layout = QHBoxLayout(self)
         self.main_layout.setSpacing(0)
-        self.main_layout.setContentsMargins(5, 0, 5, 0)
+        self.main_layout.setContentsMargins(2, 0, 2, 0)
         # 创建任务名称标签
         self.label_task_name = QLabel()
         self.label_task_name.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))

@@ -83,6 +83,7 @@ class MainWindow(UiMainWindow):
         self.label_title.setText(title)
 
     def update_task(self, task):
+        task.save()
         self.task = task
 
     def resizeEvent(self, event):

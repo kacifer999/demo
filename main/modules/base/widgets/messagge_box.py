@@ -44,7 +44,7 @@ class MessageBox(QMessageBox):
 
     def run(self):
         if self.exec():
-            return self.clicked_button
+            return self.clicked_button == QMessageBox.Cancel
         
 
     def set_ok(self):

@@ -1,3 +1,4 @@
+import shutil
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -5,6 +6,8 @@ from PyQt5.QtWidgets import *
 from main.settings.path import *
 from main.modules.base.widgets.task_node_widget import TaskNodeWidget
 from main.modules.base.widgets.task_creation_dialog import CreateTaskDialog
+from main.modules.base.widgets.messagge_box import MessageBox
+
 from main.db.dao.service import *
 
 
@@ -13,12 +16,14 @@ class TaskPanel(object):
         super().__init__()
         self.main_window = main_window
         self.widget_task_panel = main_window.widget_task_panel
+        self.selected_task_name = None
         self.task_node_dict = dict()
         self.proxy_dict = dict()
         self.location_list = list()
 
 
     def clear_task_panel(self):
+        self.selected_task_name = None
         for task_node in self.task_node_dict.values():
             task_node.signal_create_task.disconnect()
             task_node.signal_delete_task.disconnect()
@@ -36,7 +41,7 @@ class TaskPanel(object):
         self.scene = QGraphicsScene(self.widget_task_panel)
         # 初始场景大小设为视图大小
         self.scene.setSceneRect(0, 0, self.widget_task_panel.width() - 10, 
-                                self.widget_task_panel.height() - 10)
+                                      self.widget_task_panel.height() - 10)
         # 创建视图
         view = QGraphicsView(self.scene, self.widget_task_panel)
         view.setStyleSheet("border: none; border-radius: 0px;")
@@ -71,8 +76,11 @@ class TaskPanel(object):
         task_node.signal_delete_task.connect(self.delete_task)
         task_node.signal_select_task.connect(self.select_task)
         if task.is_active:
-            task_node.setStyleSheet("background-color: rgb(200, 200, 200);")
-
+            self.selected_task_name = task_name
+            task_node.setStyleSheet('background-color: rgb(200, 200, 200);')
+        else:
+            task_node.setStyleSheet('background-color: rgb(120, 120, 120);')
+        
         # 设置任务节点位置
         pre_task_name = task.toolchain_config.get('pre_task')
         if pre_task_name == 'input':
@@ -95,8 +103,8 @@ class TaskPanel(object):
         self.task_node_dict[task_name] = task_node
         self.proxy_dict[task_node.task_name]=proxy
         # 检查是否需要调整场景大小
-        rect = QRectF(0, 0, max(self.scene.width(), x + task_node.width() + 20), 
-                            max(self.scene.height(), y + task_node.height() + 20))
+        rect = QRectF(0, 0, max(self.scene.width(), x + task_node.width() + 10), 
+                            max(self.scene.height(), y + task_node.height() + 10))
         if rect != self.scene.sceneRect():
             self.scene.setSceneRect(rect)
             # 检查是否需要显示滚动条
@@ -165,8 +173,30 @@ class TaskPanel(object):
             QTimer.singleShot(0, self.main_window.build_task)
     
     def delete_task(self, task_name):
-        pass
+        # 删除任务对话框
+        msg = '确认删除任务？'
+        if MessageBox(self.main_window, 'information', '提示', msg, QMessageBox.Ok|QMessageBox.Cancel).run(): return
+        task = get_task(task_name)
+        if task is None: return
+        pre_task_name = task.toolchain_config.get('pre_task')
+        change_next_tasks(task_name, pre_task_name, remove=True)
+        pre_task = get_task(pre_task_name)
+        if task.is_active:
+            pre_task.is_active = True
+
+        delete_task_dbs(task)
+        shutil.rmtree(task.task_dir, ignore_errors=True)
+        shutil.rmtree(Path(task.project_dir, 'sdk', task_name), ignore_errors=True)
+        self.main_window.update_task(pre_task)
+        QTimer.singleShot(0, self.main_window.build_task)
+
     
     def select_task(self, task_name):
-        pass
-
+        if self.selected_task_name == task_name:return
+        self.selected_task_name = task_name
+        set_task_inactive()
+        task = get_task(task_name)
+        if task is None: return
+        task.is_active = True
+        self.main_window.update_task(task)
+        QTimer.singleShot(0, self.main_window.build_task)

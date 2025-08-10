@@ -34,7 +34,7 @@ class TaskNodeWidget(UiTaskNodeWidget):
     
     def update_ui(self):
         self.label_task_name.setText(self.task_name)
-        if len(self.next_tasks) == 0:
+        if len(self.next_tasks) == 0 and self.pre_task!='input':
             self.button_delete.show()
         else:
             self.button_delete.hide()
