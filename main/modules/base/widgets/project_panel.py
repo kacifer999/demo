@@ -19,7 +19,6 @@ class ProjectPanel(object):
         self.main_window = main_window
         self.project_panel = main_window.list_project_panel
         self.project_config = self.load_project_config()
-        self.load_project_panel()
         self.project_panel.mousePressEvent = self.mouse_press_event
         self.project_panel.itemClicked.connect(self.select_project)
         self.project_panel.customContextMenuRequested.connect(self.create_menu)
@@ -97,10 +96,10 @@ class ProjectPanel(object):
         
         item = self.add_widget_item(project_name)
         self.project_panel.setCurrentItem(item)
-        db_dir = Path(BASE_DIR,'projects', project_name,'project.db')
-        db_dir.parent.mkdir(parents=True, exist_ok=True)
-        close_db(self.main_window.project_db)
-        self.main_window.project_db = connect_db(db_dir.as_posix())
+        Path(BASE_DIR,'projects', project_name).mkdir(parents=True, exist_ok=True)
+        # 初始化数据库
+        self.main_window.project_name = project_name
+        self.main_window.connect_db()
         create_db_tables(self.main_window.project_db)
         init_data_set_type()
         self.main_window.task_panel.create_task(project_name=project_name, pre_task_name='input')
@@ -113,7 +112,7 @@ class ProjectPanel(object):
     def delete_project(self):
         item = self.project_panel.currentItem()
         self.project_panel.takeItem(self.project_panel.row(item))
-        self.main_window.project_db = close_db(self.main_window.project_db)
+        self.main_window.close_db()
         project_name = item.text()
         self.project_config.pop(project_name, None)
         if len(self.project_config) > 0:

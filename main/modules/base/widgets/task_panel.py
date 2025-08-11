@@ -15,7 +15,7 @@ class TaskPanel(object):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
-        self.widget_task_panel = main_window.widget_task_panel
+        self.panel = main_window.widget_task_panel
         self.selected_task_name = None
         self.task_node_dict = dict()
         self.proxy_dict = dict()
@@ -23,10 +23,6 @@ class TaskPanel(object):
 
 
     def clear_task_panel(self):
-        print(self.main_window.ui_project_panel.geometry())
-        print(self.main_window.ui_center_frame.geometry())
-        print(self.main_window.ui_task_panel.geometry())
-        print(self.widget_task_panel.geometry())
         self.selected_task_name = None
         for task_node in self.task_node_dict.values():
             task_node.signal_create_task.disconnect()
@@ -34,26 +30,26 @@ class TaskPanel(object):
             task_node.signal_select_task.disconnect()
             task_node.deleteLater()
 
-        if self.widget_task_panel.layout():
-            layout = self.widget_task_panel.layout()
+        if self.panel.layout():
+            layout = self.panel.layout()
             QWidget().setLayout(layout)
         
         self.task_node_dict.clear()
         self.proxy_dict.clear()
         self.location_list.clear()
         # 初始化图形视图、场景、布局
-        self.scene = QGraphicsScene(self.widget_task_panel)
+        self.scene = QGraphicsScene(self.panel)
         # 初始场景大小设为视图大小
-        self.scene.setSceneRect(0, 0, self.widget_task_panel.width() - 10, 
-                                      self.widget_task_panel.height() - 10)
+        self.scene.setSceneRect(0, 0, self.panel.width() - 10, 
+                                      self.panel.height() - 10)
         # 创建视图
-        view = QGraphicsView(self.scene, self.widget_task_panel)
+        view = QGraphicsView(self.scene, self.panel)
         view.setStyleSheet("border: none; border-radius: 0px;")
         # 初始设置为不显示滚动条
         view.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         view.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         # 创建布局并添加视图
-        layout = QVBoxLayout(self.widget_task_panel)
+        layout = QVBoxLayout(self.panel)
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(view)
@@ -156,7 +152,7 @@ class TaskPanel(object):
             project_dir = Path(BASE_DIR, 'projects', project_name)
             task_dir = Path(project_dir, task_name)
             set_task_inactive()
-            task = Task.create(uuid=str(uuid.uuid1()),
+            task = TaskModel.create(uuid=str(uuid.uuid1()),
                                task_name=task_name,
                                task_type=task_type,
                                project_dir=project_dir.as_posix(),

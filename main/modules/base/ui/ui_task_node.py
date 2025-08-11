@@ -2,6 +2,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+
 class UiTaskNodeWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -19,7 +20,6 @@ class UiTaskNodeWidget(QWidget):
         self.label_task_name = QLabel()
         self.label_task_name.setSizePolicy(QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding))
         self.label_task_name.setText("任务名称")
-        # self.label_task_name.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         self.label_task_name.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.main_layout.addWidget(self.label_task_name)
         # 创建按钮布局

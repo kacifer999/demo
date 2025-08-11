@@ -2,6 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+
 class UiMenuBar(QMenuBar):
     def __init__(self, main_window):
         super().__init__()

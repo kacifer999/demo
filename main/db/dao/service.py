@@ -1,9 +1,10 @@
 from main.db.dao.dataset import *
+from main.db.dao.image import *
 from main.db.dao.task import *
 
 
-
 def connect_db(db_dir):
+
     db = APSWDatabase(db_dir, pragmas={'journal_mode': 'wal',  # WAL-mode.
                                        'cache_size': 1024 * 16,
                                        'busy_timeout': 2000,
@@ -21,4 +22,4 @@ def close_db(db):
     db._state.reset()
 
 def create_db_tables(db):
-    db.create_tables([Task])
+    db.create_tables([TaskModel, ImageModel, ViewModel])

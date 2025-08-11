@@ -2,10 +2,12 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from .ui_menubar import UiMenuBar
-from .ui_project_panel import UiProjectPanel
-from .ui_center_frame import UiCenterFrame
 from .ui_view_list import UiViewListPanel
+from main.modules.base.ui.ui_menubar import UiMenuBar
+from main.modules.base.ui.ui_project_panel import UiProjectPanel
+from main.modules.base.ui.ui_center_frame import UiCenterFrame
+from main.modules.base.ui.ui_view_list import UiViewListPanel
+
 
 class UiMainWindow(QMainWindow):
     def __init__(self):
@@ -39,10 +41,11 @@ class UiMainWindow(QMainWindow):
         self.create_center_content()
         self.ui_task_panel = self.ui_center_frame.frame_task_panel
         self.widget_task_panel = self.ui_center_frame.widget_task_panel
+        self.widget_button_panel = self.ui_center_frame.widget_button_panel
         self.create_view_list_panel()
         # 创建状态栏
-        self.statusbar = QStatusBar()
-        self.setStatusBar(self.statusbar)
+        self.status_bar = QStatusBar()
+        self.setStatusBar(self.status_bar)
         # 统一设置尺寸
         self.setup_widget_sizes()
 

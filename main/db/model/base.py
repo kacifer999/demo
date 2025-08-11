@@ -1,4 +1,5 @@
 import datetime
+from turtle import width
 from peewee import *
 from playhouse.sqlite_ext import JSONField
 
@@ -10,7 +11,8 @@ class BaseModel(Model):
     class Meta:
         database = DB_PROXY
 
-class Task(BaseModel):
+
+class TaskModel(BaseModel):
     task_name = CharField()
     task_type = CharField()
     project_dir = CharField()
@@ -23,8 +25,23 @@ class Task(BaseModel):
     task_config = JSONField(default={})
     filter_config = JSONField(default={})
     toolchain_config = JSONField(default={})
-    
-    
+
+
+class ImageModel(BaseModel):
+    image_name = CharField()
+    width = IntegerField()
+    height = IntegerField()
+
+
+class ViewModel(BaseModel):
+    view_name = CharField()
+    view_id = IntegerField()
+    prev_task = CharField()
+    xywha = JSONField()
+
+
+
+
 
 
 
