@@ -23,6 +23,10 @@ class TaskPanel(object):
 
 
     def clear_task_panel(self):
+        print(self.main_window.ui_project_panel.geometry())
+        print(self.main_window.ui_center_frame.geometry())
+        print(self.main_window.ui_task_panel.geometry())
+        print(self.widget_task_panel.geometry())
         self.selected_task_name = None
         for task_node in self.task_node_dict.values():
             task_node.signal_create_task.disconnect()

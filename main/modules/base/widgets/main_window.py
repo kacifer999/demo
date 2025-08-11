@@ -17,9 +17,6 @@ from main.db.dao.service import *
 
 # 主界面类
 class MainWindow(UiMainWindow):
-    """
-    主界面类，继承自QMainWindow类，统筹管理各个模块，对主要事件进行处理
-    """
     def __init__(self, name="Demo"):
         super().__init__()
         self.name = name
@@ -32,7 +29,7 @@ class MainWindow(UiMainWindow):
         # 设置窗口固定大小，不可拖拽变形
         self.setFixedSize(work_width, work_height - 25)
         self.setWindowState(Qt.WindowMaximized)
-        self.show()
+        self.showMaximized()
         self.hide()
         self.set_window_title()
         # 添加任务管理
@@ -51,8 +48,16 @@ class MainWindow(UiMainWindow):
     
 
     def connect_view_menu_actions(self):
+        # 显示/隐藏工程管理
         self.action_project_panel.triggered.connect(self.project_panel.show_project_panel)
+        # 显示/隐藏任务管理作
         self.action_task_panel.triggered.connect(self.task_panel.show_task_panel)
+    
+
+    def adjust_window_geometry(self):
+        self.ui_task_panel.hide()
+        self.ui_task_panel.showMaximized()
+        self.task_panel.build_task_panel()
 
 
     def build_project(self, project_name):

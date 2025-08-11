@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-from PyQt5.QtWidgets import QFrame, QVBoxLayout, QListWidget
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 class UiProjectPanel(QFrame):
     def __init__(self, main_window):
@@ -9,6 +8,8 @@ class UiProjectPanel(QFrame):
         self.main_window = main_window
         self.setFrameShape(QFrame.NoFrame)
         self.setFrameShadow(QFrame.Plain)
+        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
+        self.setFixedWidth(200)
         self.setStyleSheet("background-color: rgb(127, 127, 127); border: 1px solid rgb(150, 150, 150); border-radius: 0px;")
         self.project_layout = QVBoxLayout(self)
         self.project_layout.setSpacing(0)

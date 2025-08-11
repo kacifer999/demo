@@ -9,6 +9,8 @@ class UiViewListPanel(QFrame):
         self.main_window = main_window
         self.setFrameShape(QFrame.NoFrame)
         self.setFrameShadow(QFrame.Plain)
+        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
+        self.setFixedWidth(150)
         self.setStyleSheet("background-color: rgb(127, 127, 127); border: 1px solid rgb(150, 150, 150); border-radius: 0px;")
         self.init_ui()
 

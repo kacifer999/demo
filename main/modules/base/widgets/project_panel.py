@@ -46,6 +46,7 @@ class ProjectPanel(object):
             self.main_window.ui_project_panel.show()
         else:
             self.main_window.ui_project_panel.hide()
+            self.main_window.adjust_window_geometry()
     
 
     def create_menu(self):

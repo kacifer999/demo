@@ -93,8 +93,5 @@ class UiMainWindow(QMainWindow):
     
     
     def setup_widget_sizes(self):
-        # 设置主布局拉伸系数 (10%: 80%: 10%)
-        self.main_layout.setStretch(0, 1)  # 项目面板
-        self.main_layout.setStretch(1, 8)  # 中心面板
-        self.main_layout.setStretch(2, 1)  # 视图列表面板
         self.ui_center_frame.setup_sizes()
+    

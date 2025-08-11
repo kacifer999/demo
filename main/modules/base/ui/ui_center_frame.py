@@ -9,6 +9,7 @@ class UiCenterFrame(QFrame):
         self.main_window = main_window
         self.setFrameShape(QFrame.NoFrame)
         self.setFrameShadow(QFrame.Plain)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.setStyleSheet("border: none; border-radius: 0px;")
         self.init_ui()
 
@@ -86,6 +87,8 @@ class UiCenterFrame(QFrame):
         self.frame_config_panel = QFrame()
         self.frame_config_panel.setFrameShape(QFrame.NoFrame)
         self.frame_config_panel.setFrameShadow(QFrame.Plain)
+        self.frame_config_panel.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
+        self.frame_config_panel.setFixedWidth(400)
         self.frame_config_panel.setStyleSheet("border: 1px solid rgb(150, 150, 150); border-radius: 0px;")
 
         # 添加到布局
@@ -108,11 +111,11 @@ class UiCenterFrame(QFrame):
         self.frame_center.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
 
         # 设置水平布局拉伸系数
-        self.layout_label_train.setStretch(0, 7)  # 标签工具面板
-        self.layout_label_train.setStretch(1, 3)  # 配置面板
+        # self.layout_label_train.setStretch(0, 7)  # 标签工具面板
+        # self.layout_label_train.setStretch(1, 3)  # 配置面板
 
         # 设置标签工具面板尺寸策略
-        self.frame_label_tool.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
+        # self.frame_label_tool.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
 
         # 设置配置面板尺寸策略
         self.frame_config_panel.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
