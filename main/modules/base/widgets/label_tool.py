@@ -32,9 +32,8 @@ class LabelTool(QWidget):
             return False
         self.scale = 1.0
         self.offset = QPoint(0, 0)
-        self.fit_image_to_widget()
+        self.fit_image()
         return True
-
     
 
     def paintEvent(self, event):
@@ -80,20 +79,22 @@ class LabelTool(QWidget):
 
     def mousePressEvent(self, event):
         if not self.image or self.image.isNull():return
-        if event.button() == Qt.RightButton:
+        self.set_mouse_pos(event.pos())
+        if event.button() == Qt.RightButton and self.mouse_pos == event.pos():
             self.is_dragging = True
-            self.last_pos = event.pos()
+            self.last_pos = self.mouse_pos
             self.setCursor(Qt.ClosedHandCursor)
+
 
     def mouseMoveEvent(self, event):
         if not self.image or self.image.isNull(): return
         old_pos = self.mouse_pos
-        self.mouse_pos = event.pos()
-        
+        # 限制鼠标在图片内
+        self.set_mouse_pos(event.pos())
+        # 拖动图像
         if self.is_dragging:
-            delta = self.mouse_pos - self.last_pos
-            self.offset += delta
-            self.last_pos = event.pos()
+            self.offset += self.mouse_pos - self.last_pos
+            self.last_pos = self.mouse_pos
             self.update()
             return
         
@@ -107,13 +108,11 @@ class LabelTool(QWidget):
 
 
     def mouseReleaseEvent(self, event):
+        if not self.image or self.image.isNull(): return
+        self.set_mouse_pos(event.pos())
         if event.button() == Qt.RightButton and self.is_dragging:
             self.is_dragging = False
             self.setCursor(Qt.ArrowCursor)
-            
-        # 鼠标释放后，显示画笔
-        self.is_showing_pen = True
-        self.mouse_pos = event.pos()
         
         # 更新画笔区域
         pen_area = QRect(
@@ -123,6 +122,18 @@ class LabelTool(QWidget):
             self.pen_size + 20
         )
         self.update(pen_area)
+    
+    def set_mouse_pos(self, pos):
+        # 计算图像边界
+        image_rect = QRect(self.offset.x(), 
+                           self.offset.y(),
+                           self.scaled_image.width(),
+                           self.scaled_image.height())
+        if image_rect.contains(pos):
+            self.mouse_pos = pos
+        else:
+            self.mouse_pos = QPoint(max(image_rect.left(), min(pos.x(), image_rect.right())),
+                                    max(image_rect.top(), min(pos.y(), image_rect.bottom())))
 
 
     def set_pen_size(self, size):
@@ -135,15 +146,15 @@ class LabelTool(QWidget):
                                               round(self.image.size().height() * self.scale),
                                               Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
-    def fit_image_to_widget(self):
+
+    def fit_image(self):
         if not self.image or self.image.isNull(): return
-        widget_w, widget_h = self.width(), self.height()
         image_w, image_h = self.image.size().width(), self.image.size().height()
-        self.scale = min(widget_w / image_w, widget_h / image_h)
+        self.scale = min(self.width() / image_w, self.height() / image_h)
         self.update_image()
         # 居中显示
-        self.offset = QPoint(round((widget_w - self.scaled_image.width()) / 2),
-                             round((widget_h - self.scaled_image.height()) // 2))
+        self.offset = QPoint(round((self.width() - self.scaled_image.width()) / 2),
+                             round((self.height() - self.scaled_image.height()) / 2))
         self.update()
         
 
@@ -158,7 +169,7 @@ if __name__ == '__main__':
     label_tool.setMinimumSize(800, 550)
     # 创建按钮和滑块
     fit_button = QPushButton('适应窗口')
-    fit_button.clicked.connect(label_tool.fit_image_to_widget)
+    fit_button.clicked.connect(label_tool.fit_image)
     # 画笔大小调节滑块
     pen_size_label = QLabel('画笔大小:')
     pen_size_slider = QSlider(Qt.Horizontal)
