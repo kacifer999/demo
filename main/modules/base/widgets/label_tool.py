@@ -19,6 +19,17 @@ class LabelTool(QWidget):
         self.pen_size = 20
         self.is_showing_pen = True
         self.setMouseTracking(True)
+        self.image_layer = None
+        self.pen_layer = None
+        self.init_layers()
+    
+
+    def init_layers(self):
+        self.image_layer = QImage(self.size(), QImage.Format_ARGB32)
+        self.pen_layer = QImage(self.size(), QImage.Format_ARGB32)
+        self.image_layer.fill(Qt.transparent)
+        self.pen_layer.fill(Qt.transparent)
+
 
     def load_image(self, image_path=None, qimage=None):
         if qimage:
@@ -32,33 +43,43 @@ class LabelTool(QWidget):
             return False
         self.scale = 1.0
         self.offset = QPoint(0, 0)
+        self.init_layers()
         self.fit_image()
         return True
-    
+
+
+    def update_image_layer(self):
+        self.image_layer.fill(Qt.transparent)
+        if not self.image or self.image.isNull(): return
+        painter = QPainter(self.image_layer)
+        painter.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
+        rect = QRect(self.offset.x(), self.offset.y(), self.scaled_image.width(), self.scaled_image.height())
+        painter.drawPixmap(rect, QPixmap.fromImage(self.scaled_image))
+        painter.end()
+        self.update_pen_layer()
+
+
+    def update_pen_layer(self):
+        self.pen_layer.fill(Qt.transparent)
+        if not self.is_showing_pen: return
+        painter = QPainter(self.pen_layer)
+        painter.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
+        radius = round(self.pen_size / 2)
+        # 绘制黑色画笔
+        painter.setPen(QPen(QColor(0, 0, 0, 100), 2, Qt.SolidLine, Qt.RoundCap))
+        painter.drawEllipse(self.mouse_pos, radius - 1, radius - 1)
+        # 绘制白色画笔
+        painter.setPen(QPen(QColor(255, 255, 255, 200), 2, Qt.SolidLine, Qt.RoundCap))
+        painter.drawEllipse(self.mouse_pos, radius - 2, radius - 2)
+        painter.end()
+
 
     def paintEvent(self, event):
         if not self.image or self.image.isNull(): return
-        # 绘制图片
         painter = QPainter(self)
-        painter.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
-        image_rect = QRect(self.offset.x(), self.offset.y(), self.scaled_image.width(), self.scaled_image.height())
-        painter.drawPixmap(image_rect, QPixmap.fromImage(self.scaled_image))
-        # 绘制画笔
-        self.paint_pen()
-    
-    
-    def paint_pen(self):
-        if not self.is_showing_pen: return
-        painter = QPainter(self)
-        painter.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
-        # 计算圆环半径
-        radius = round(self.pen_size / 2)
-        # 绘制白色画笔
-        painter.setPen(QPen(QColor(255, 255, 255, 200), 1, Qt.SolidLine, Qt.RoundCap))
-        painter.drawEllipse(self.mouse_pos, radius, radius)
-        # 绘制黑色画笔
-        painter.setPen(QPen(QColor(0, 0, 0, 100), 1, Qt.SolidLine, Qt.RoundCap))
-        painter.drawEllipse(self.mouse_pos, radius + 1, radius + 1)
+        painter.drawImage(0, 0, self.image_layer)
+        painter.drawImage(0, 0, self.pen_layer)
+        painter.end()
 
 
     def wheelEvent(self, event):
@@ -75,7 +96,9 @@ class LabelTool(QWidget):
         # 确保鼠标指向点不变
         self.offset = QPoint(round(pos.x() - image_x * self.scale), 
                              round(pos.y() - image_y * self.scale))
+        self.update_image_layer()
         self.update()
+
 
     def mousePressEvent(self, event):
         if not self.image or self.image.isNull():return
@@ -88,23 +111,16 @@ class LabelTool(QWidget):
 
     def mouseMoveEvent(self, event):
         if not self.image or self.image.isNull(): return
-        old_pos = self.mouse_pos
-        # 限制鼠标在图片内
         self.set_mouse_pos(event.pos())
         # 拖动图像
         if self.is_dragging:
             self.offset += self.mouse_pos - self.last_pos
             self.last_pos = self.mouse_pos
+            self.update_image_layer()
             self.update()
             return
-        
-        pen_radius = self.pen_size // 2 + 10
-        x1, y1 = old_pos.x() - pen_radius, old_pos.y() - pen_radius
-        x2, y2 = self.mouse_pos.x() - pen_radius, self.mouse_pos.y() - pen_radius
-        pen_area = QRect(min(x1, x2), min(y1, y2),
-                        abs(x1 - x2) + 2 * pen_radius,
-                        abs(y1 - y2) + 2 * pen_radius)
-        self.update(pen_area)
+        self.update_pen_layer()
+        self.update()
 
 
     def mouseReleaseEvent(self, event):
@@ -114,14 +130,9 @@ class LabelTool(QWidget):
             self.is_dragging = False
             self.setCursor(Qt.ArrowCursor)
         
-        # 更新画笔区域
-        pen_area = QRect(
-            self.mouse_pos.x() - self.pen_size//2 - 10,
-            self.mouse_pos.y() - self.pen_size//2 - 10,
-            self.pen_size + 20,
-            self.pen_size + 20
-        )
-        self.update(pen_area)
+        # 更新画笔
+        self.update_pen_layer()
+        self.update()
     
     def set_mouse_pos(self, pos):
         # 计算图像边界
@@ -138,6 +149,8 @@ class LabelTool(QWidget):
 
     def set_pen_size(self, size):
         self.pen_size = max(1, min(200, size))
+        self.update_pen_layer()
+        self.update()
 
 
     def update_image(self):
@@ -155,8 +168,9 @@ class LabelTool(QWidget):
         # 居中显示
         self.offset = QPoint(round((self.width() - self.scaled_image.width()) / 2),
                              round((self.height() - self.scaled_image.height()) / 2))
+        self.update_image_layer()
         self.update()
-        
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
