@@ -3,6 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from main.modules.base.ui.ui_button_panel import UiButtonPanel
+from main.modules.base.widgets.label_tool import LabelTool
 
 
 class UiCenterFrame(QFrame):
@@ -101,6 +102,15 @@ class UiCenterFrame(QFrame):
         self.frame_config_panel.setFixedWidth(400)
         self.frame_config_panel.setStyleSheet("QFrame {border: 1px solid rgb(150, 150, 150); border-radius: 0px;}")
         
+        # 创建布局
+        self.layout_config_panel = QVBoxLayout(self.frame_config_panel)
+        self.layout_config_panel.setSpacing(0)
+        self.layout_config_panel.setContentsMargins(0, 0, 0, 0)
+        
+        # 创建LabelTool
+        self.LabelTool = LabelTool(self)
+        self.LabelTool.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.layout_config_panel.addWidget(self.LabelTool)
 
         # 添加到布局
         self.layout_label_train.addWidget(self.frame_config_panel)
