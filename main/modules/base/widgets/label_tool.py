@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -14,8 +15,8 @@ class LabelTool(QWidget):
         self.scale = 1.0
         self.offset = QPoint(0, 0) # 图像对于窗口的偏移量
         self.is_dragging = False
-        self.last_pos = QPoint(0, 0)
-        self.mouse_pos = QPoint(-1, -1)
+        self.last_drag_pos = None
+        self.mouse_pos = None
         self.pen_size = 20
         self.is_showing_pen = True
         self.setMouseTracking(True)
@@ -61,7 +62,7 @@ class LabelTool(QWidget):
 
     def update_pen_layer(self):
         self.pen_layer.fill(Qt.transparent)
-        if not self.is_showing_pen: return
+        if not self.is_showing_pen or self.mouse_pos is None: return
         painter = QPainter(self.pen_layer)
         painter.setRenderHints(QPainter.Antialiasing | QPainter.SmoothPixmapTransform)
         radius = round(self.pen_size / 2)
@@ -84,18 +85,17 @@ class LabelTool(QWidget):
 
     def wheelEvent(self, event):
         if not self.image or self.image.isNull(): return
+        self.set_mouse_pos(event.pos())
         # 计算新缩放比例
-        factor = 1.1 if event.angleDelta().y() > 0 else 0.9
+        factor = 1.25 if event.angleDelta().y() > 0 else 0.8
         old_scale = self.scale
-        self.scale = max(0.1, min(10, old_scale * factor))
-        # 计算鼠标在图片上的位置
-        pos = event.pos()
-        image_x = round((pos.x() - self.offset.x()) / old_scale)
-        image_y = round((pos.y() - self.offset.y()) / old_scale)
-        self.update_image()
-        # 确保鼠标指向点不变
-        self.offset = QPoint(round(pos.x() - image_x * self.scale), 
-                             round(pos.y() - image_y * self.scale))
+        self.scale = np.clip(old_scale * factor, 0.1, 10)
+        self.update_image(self.scale)
+        # 计算新的偏移量
+        x = round((self.mouse_pos.x() - self.offset.x()) / old_scale * self.scale)
+        y = round((self.mouse_pos.y() - self.offset.y()) / old_scale * self.scale)
+        self.offset = QPoint(self.mouse_pos.x() - x, self.mouse_pos.y() - y)
+        # 更新图像图层
         self.update_image_layer()
         self.update()
 
@@ -105,7 +105,7 @@ class LabelTool(QWidget):
         self.set_mouse_pos(event.pos())
         if event.button() == Qt.RightButton and self.mouse_pos == event.pos():
             self.is_dragging = True
-            self.last_pos = self.mouse_pos
+            self.last_drag_pos = self.mouse_pos
             self.setCursor(Qt.ClosedHandCursor)
 
 
@@ -114,11 +114,12 @@ class LabelTool(QWidget):
         self.set_mouse_pos(event.pos())
         # 拖动图像
         if self.is_dragging:
-            self.offset += self.mouse_pos - self.last_pos
-            self.last_pos = self.mouse_pos
+            self.offset += self.mouse_pos - self.last_drag_pos
+            self.last_drag_pos = self.mouse_pos
             self.update_image_layer()
             self.update()
             return
+        
         self.update_pen_layer()
         self.update()
 
@@ -133,18 +134,13 @@ class LabelTool(QWidget):
         # 更新画笔
         self.update_pen_layer()
         self.update()
-    
+
+
     def set_mouse_pos(self, pos):
-        # 计算图像边界
-        image_rect = QRect(self.offset.x(), 
-                           self.offset.y(),
-                           self.scaled_image.width(),
-                           self.scaled_image.height())
-        if image_rect.contains(pos):
-            self.mouse_pos = pos
-        else:
-            self.mouse_pos = QPoint(max(image_rect.left(), min(pos.x(), image_rect.right())),
-                                    max(image_rect.top(), min(pos.y(), image_rect.bottom())))
+        rect = QRect(self.offset.x(), self.offset.y(),
+                           self.scaled_image.width(), self.scaled_image.height())
+        self.mouse_pos = QPoint(np.clip(pos.x(), rect.left(), rect.right()),
+                                    np.clip(pos.y(), rect.top(), rect.bottom()))
 
 
     def set_pen_size(self, size):
@@ -153,19 +149,19 @@ class LabelTool(QWidget):
         self.update()
 
 
-    def update_image(self):
+    def update_image(self, scale):
         if not self.image or self.image.isNull(): return
-        self.scaled_image = self.image.scaled(round(self.image.size().width() * self.scale),
-                                              round(self.image.size().height() * self.scale),
+        self.scaled_image = self.image.scaled(round(self.image.size().width() * scale),
+                                              round(self.image.size().height() * scale),
                                               Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
 
     def fit_image(self):
         if not self.image or self.image.isNull(): return
-        image_w, image_h = self.image.size().width(), self.image.size().height()
-        self.scale = min(self.width() / image_w, self.height() / image_h)
-        self.update_image()
-        # 居中显示
+        self.scale = min(self.width() / self.image.size().width(), 
+                         self.height() / self.image.size().height())
+        self.update_image(self.scale)
+        # 计算偏移量
         self.offset = QPoint(round((self.width() - self.scaled_image.width()) / 2),
                              round((self.height() - self.scaled_image.height()) / 2))
         self.update_image_layer()
