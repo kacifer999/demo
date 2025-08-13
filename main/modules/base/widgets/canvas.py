@@ -170,6 +170,13 @@ class Canvas(QWidget):
                              round((self.height() - self.scaled_image.height()) / 2))
         self.update_image_layer()
         self.update()
+        
+    def resizeEvent(self, event):
+        # 当窗口大小改变时，自动调整图像大小
+        if self.image and not self.image.isNull():
+            self.init_layers()
+            self.fit_image()
+        super().resizeEvent(event)
 
 
 if __name__ == '__main__':
