@@ -6,10 +6,11 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 
-class LabelTool(QWidget):
+class Canvas(QWidget):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.image = None
         self.scaled_image = None
         self.scale = 1.0
@@ -23,6 +24,9 @@ class LabelTool(QWidget):
         self.image_layer = None
         self.pen_layer = None
         self.init_layers()
+        
+        self.load_image(r'C:\Users\kacif\Downloads\键盘工程测试图片\CLS\OK\00_02_20_727_HXMH1GL3AV3000068L_NUM1.png')
+
     
 
     def init_layers(self):
@@ -175,7 +179,7 @@ if __name__ == '__main__':
     main_widget.resize(800, 600)
     main_layout = QVBoxLayout(main_widget)
     # 创建LabelTool实例
-    label_tool = LabelTool(main_widget)
+    label_tool = Canvas(main_widget)
     label_tool.setMinimumSize(800, 550)
     # 创建按钮和滑块
     load_button = QPushButton('加载图片')
