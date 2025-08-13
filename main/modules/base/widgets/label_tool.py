@@ -178,6 +178,15 @@ if __name__ == '__main__':
     label_tool = LabelTool(main_widget)
     label_tool.setMinimumSize(800, 550)
     # 创建按钮和滑块
+    load_button = QPushButton('加载图片')
+    def load_image_dialog():
+        file_path, _ = QFileDialog.getOpenFileName(
+            main_widget, '选择图片', '', '图片文件 (*.png *.jpg *.jpeg *.bmp)'
+        )
+        if file_path:
+            label_tool.load_image(file_path)
+    load_button.clicked.connect(load_image_dialog)
+    
     fit_button = QPushButton('适应窗口')
     fit_button.clicked.connect(label_tool.fit_image)
     # 画笔大小调节滑块
@@ -192,10 +201,11 @@ if __name__ == '__main__':
     slider_layout.addWidget(pen_size_slider)
     # 添加到布局并显示
     main_layout.addWidget(label_tool)
-    main_layout.addWidget(fit_button)
+    button_layout = QHBoxLayout()
+    button_layout.addWidget(load_button)
+    button_layout.addWidget(fit_button)
+    main_layout.addLayout(button_layout)
     main_layout.addLayout(slider_layout)
     main_widget.show()
-    # 加载示例图片
-    label_tool.load_image(r'C:\Users\kacif\Downloads\键盘工程测试图片\CLS\OK\00_02_20_727_HXMH1GL3AV3000068L_NUM1.png')
 
     sys.exit(app.exec_())
