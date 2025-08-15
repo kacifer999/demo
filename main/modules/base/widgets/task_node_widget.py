@@ -23,7 +23,7 @@ class TaskNodeWidget(UiTaskNodeWidget):
         self.task_panel = task_panel
         self.main_window = task_panel.main_window
         self.task_name = task.task_name
-        self.pre_task = task.toolchain_config.get('pre_task')
+        self.prev_task = task.toolchain_config.get('prev_task')
         self.next_tasks = task.toolchain_config.get('next_tasks')
         self.row = 0
         self.col = 0
@@ -34,7 +34,7 @@ class TaskNodeWidget(UiTaskNodeWidget):
     
     def update_ui(self):
         self.label_task_name.setText(self.task_name)
-        if len(self.next_tasks) == 0 and self.pre_task!='input':
+        if len(self.next_tasks) == 0 and self.prev_task!='input':
             self.button_delete.show()
         else:
             self.button_delete.hide()

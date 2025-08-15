@@ -2,7 +2,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from main.modules.base.ui.ui_button_panel import UiButtonPanel
+from main.modules.base.widgets.button_panel import ButtonPanel
+from main.modules.base.widgets.canvas_tool_widget import CanvasToolWidget
+from main.modules.base.widgets.label_marker_widget import LabelMarkerWidget
 from main.modules.base.widgets.canvas import Canvas
 
 
@@ -27,7 +29,7 @@ class UiCenterFrame(QFrame):
         self.create_button_panel()
 
         # 创建垂直中心面板
-        self.create_v_center_panel()
+        self.create_center_panel()
 
     def create_task_panel(self):
         self.frame_task_panel = QFrame()
@@ -58,12 +60,12 @@ class UiCenterFrame(QFrame):
         self.layout_button_panel.setSpacing(0)
         self.layout_button_panel.setContentsMargins(0, 0, 0, 0)
         # 创建按钮面板
-        self.widget_button_panel = UiButtonPanel(self.main_window)
+        self.widget_button_panel = ButtonPanel(self.main_window)
         self.layout_button_panel.addWidget(self.widget_button_panel)
         # 添加到中心布局
         self.layout_center.addWidget(self.frame_button_panel)
 
-    def create_v_center_panel(self):
+    def create_center_panel(self):
         # 创建垂直中心面板框架
         self.frame_center = QFrame()
         self.frame_center.setFrameShape(QFrame.NoFrame)
@@ -89,15 +91,31 @@ class UiCenterFrame(QFrame):
         self.frame_label_tool.setFrameShadow(QFrame.Plain)
         self.frame_label_tool.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding))
         self.frame_label_tool.setStyleSheet("QFrame {border: 1px solid rgb(150, 150, 150); border-radius: 0px;}")
-        # 创建布局
-        self.layout_config_panel = QVBoxLayout(self.frame_label_tool)
-        self.layout_config_panel.setSpacing(0)
-        self.layout_config_panel.setContentsMargins(0, 0, 0, 0)
+        # 创建水平布局
+        self.layout_h_label = QHBoxLayout(self.frame_label_tool)
+        self.layout_h_label.setSpacing(0)
+        self.layout_h_label.setContentsMargins(0, 0, 0, 0)
+        # 创建Canvas工具栏
+        self.canvas_tool = CanvasToolWidget()
+        self.layout_h_label.addWidget(self.canvas_tool)
+        # 创建垂直布局
+        self.layout_v_label = QVBoxLayout()
+        self.layout_v_label.setSpacing(0)
+        self.layout_v_label.setContentsMargins(0, 0, 0, 0)
+        self.layout_h_label.addLayout(self.layout_v_label)
+        # 标注标记控件
+        self.label_marker = LabelMarkerWidget()
+        self.layout_v_label.addWidget(self.label_marker)
         # 创建Canvas
         self.canvas = Canvas(self)
-        self.layout_config_panel.addWidget(self.canvas)
-
-        # 添加到布局
+        self.layout_v_label.addWidget(self.canvas)
+        # 创建信息显示区域
+        self.view_info = QLabel()
+        self.view_info.setFixedHeight(35)
+        self.view_info.setStyleSheet("background-color: black; color: white; border: none;")
+        self.view_info.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        self.view_info.setText("视图信息")
+        self.layout_v_label.addWidget(self.view_info)
         self.layout_label_train.addWidget(self.frame_label_tool)
 
     def create_config_panel(self):
@@ -114,6 +132,6 @@ class UiCenterFrame(QFrame):
 
     def setup_sizes(self):
         # 设置中心布局拉伸系数
-        self.layout_center.setStretch(0, 2)  # 任务面板
+        self.layout_center.setStretch(0, 20)  # 任务面板
         self.layout_center.setStretch(1, 0)  # 按钮面板
-        self.layout_center.setStretch(2, 8)  # 垂直中心面板
+        self.layout_center.setStretch(2, 80)  # 垂直中心面板

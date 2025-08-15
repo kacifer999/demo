@@ -45,7 +45,6 @@ class ProjectPanel(object):
             self.main_window.ui_project_panel.show()
         else:
             self.main_window.ui_project_panel.hide()
-            self.main_window.adjust_window_geometry()
     
 
     def create_menu(self):
@@ -102,7 +101,7 @@ class ProjectPanel(object):
         self.main_window.connect_db()
         create_db_tables(self.main_window.project_db)
         init_data_set_type()
-        self.main_window.task_panel.create_task(project_name=project_name, pre_task_name='input')
+        self.main_window.task_panel.create_task(project_name=project_name, prev_task_name='input')
         {self.project_config[name]: 'inactive' for name in self.project_config}
         self.project_config[project_name] = 'active'
         self.project_config.dump(PROJECTS_CONFIG_DIR)

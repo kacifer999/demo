@@ -7,7 +7,7 @@ class UiMenuBar(QMenuBar):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
-        self.setMinimumHeight(25)
+        self.setMinimumHeight(15)
         self.menu_font = QFont()
         self.menu_font.setPointSize(12)
         self.menu_font.setBold(True)

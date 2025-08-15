@@ -11,15 +11,22 @@ from main.modules.base.widgets.messagge_box import MessageBox
 from main.db.dao.service import *
 
 
-class TaskPanel(object):
+class TaskPanel(QObject):
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
         self.panel = main_window.widget_task_panel
+        self.panel.installEventFilter(self)
         self.selected_task_name = None
         self.task_node_dict = dict()
         self.proxy_dict = dict()
         self.location_list = list()
+
+
+    def eventFilter(self, obj, event):
+        if obj == self.panel and event.type() == QEvent.Resize:
+            self.build_task_panel()
+        return super().eventFilter(obj, event)
 
 
     def clear_task_panel(self):
@@ -82,14 +89,14 @@ class TaskPanel(object):
             task_node.setStyleSheet('background-color: rgb(120, 120, 120);')
         
         # 设置任务节点位置
-        pre_task_name = task.toolchain_config.get('pre_task')
-        if pre_task_name == 'input':
+        prev_task_name = task.toolchain_config.get('prev_task')
+        if prev_task_name == 'input':
             task_node.set_location(0, 0)
         else:
-            pre_task = get_task(pre_task_name)
-            if pre_task:
-                pre_task_node = self.task_node_dict[pre_task.task_name]
-                col, row = pre_task_node.col + 1, pre_task_node.row + pre_task_node.next_tasks.index(task_name)
+            prev_task = get_task(prev_task_name)
+            if prev_task:
+                prev_node = self.task_node_dict[prev_task.task_name]
+                col, row = prev_node.col + 1, prev_node.row + prev_node.next_tasks.index(task_name)
                 while (row, col) in self.location_list: row += 1
                 self.location_list.append((row, col))
                 task_node.set_location(row, col)
@@ -121,10 +128,10 @@ class TaskPanel(object):
     def draw_connections(self):
         for task_node in self.task_node_dict.values():
             proxy = self.proxy_dict[task_node.task_name]
-            pre_task_name = task_node.pre_task
-            if pre_task_name == 'input': continue
-            from_node = self.task_node_dict[pre_task_name]
-            from_proxy = self.proxy_dict[pre_task_name]
+            prev_task_name = task_node.prev_task
+            if prev_task_name == 'input': continue
+            from_node = self.task_node_dict[prev_task_name]
+            from_proxy = self.proxy_dict[prev_task_name]
             # 计算连接点
             start_x = from_proxy.x() + from_node.width() + 1
             start_y = from_proxy.y() + from_node.height() // 2
@@ -143,7 +150,7 @@ class TaskPanel(object):
             self.scene.addPath(path, QPen(QColor(93, 71, 139), 2, Qt.SolidLine))
     
     
-    def create_task(self, project_name, pre_task_name):
+    def create_task(self, project_name, prev_task_name):
         # 创建任务对话框
         dialog = CreateTaskDialog(self.main_window)
         if dialog.exec() == QDialog.Accepted:
@@ -159,7 +166,7 @@ class TaskPanel(object):
                                task_dir=task_dir.as_posix(),
                                is_active=True,
                                model_type='',
-                               toolchain_config=dict(pre_task=pre_task_name, next_tasks=list()))
+                               toolchain_config=dict(prev_task=prev_task_name, next_tasks=list()))
 
             # TODO
             # init_task_category(task)
@@ -167,8 +174,8 @@ class TaskPanel(object):
             if task.task_type in ['segmentation']:
                 Path(task_dir, 'annotations').mkdir(exist_ok=True)
 
-            if pre_task_name == 'input': return
-            change_next_tasks(task_name, pre_task_name)
+            if prev_task_name == 'input': return
+            change_next_tasks(task_name, prev_task_name)
             self.main_window.update_task(task)
             QTimer.singleShot(0, self.main_window.build_task)
     
@@ -178,16 +185,16 @@ class TaskPanel(object):
         if MessageBox(self.main_window, 'information', '提示', msg, QMessageBox.Ok|QMessageBox.Cancel).run(): return
         task = get_task(task_name)
         if task is None: return
-        pre_task_name = task.toolchain_config.get('pre_task')
-        change_next_tasks(task_name, pre_task_name, remove=True)
-        pre_task = get_task(pre_task_name)
+        prev_task_name = task.toolchain_config.get('prev_task')
+        change_next_tasks(task_name, prev_task_name, remove=True)
+        prev_task = get_task(prev_task_name)
         if task.is_active:
-            pre_task.is_active = True
+            prev_task.is_active = True
 
         delete_task_dbs(task)
         shutil.rmtree(task.task_dir, ignore_errors=True)
         shutil.rmtree(Path(task.project_dir, 'sdk', task_name), ignore_errors=True)
-        self.main_window.update_task(pre_task)
+        self.main_window.update_task(prev_task)
         QTimer.singleShot(0, self.main_window.build_task)
 
     

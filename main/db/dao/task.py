@@ -15,10 +15,10 @@ def set_task_inactive():
     TaskModel.update(is_active=False).where(TaskModel.is_active == True).execute()
 
 
-def change_next_tasks(task_name, pre_task_name, remove=False):
-    pre_task = get_task(pre_task_name)
-    if pre_task is None: return
-    toolchain_config = pre_task.toolchain_config
+def change_next_tasks(task_name, prev_task_name, remove=False):
+    prev_task = get_task(prev_task_name)
+    if prev_task is None: return
+    toolchain_config = prev_task.toolchain_config
     next_tasks = toolchain_config.get('next_tasks', list())
     if remove:
         if task_name in next_tasks:
@@ -28,11 +28,11 @@ def change_next_tasks(task_name, pre_task_name, remove=False):
             next_tasks.append(task_name)
 
     toolchain_config['next_tasks'] = next_tasks
-    pre_task.toolchain_config = toolchain_config
-    pre_task.save()
+    prev_task.toolchain_config = toolchain_config
+    prev_task.save()
 
 def get_first_task():
-    return next((task for task in TaskModel.select() if task.toolchain_config.get('pre_task') == 'input'), None)
+    return next((task for task in TaskModel.select() if task.toolchain_config.get('prev_task') == 'input'), None)
 
 # TODO
 def delete_task_dbs(task):

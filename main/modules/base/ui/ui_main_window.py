@@ -42,6 +42,10 @@ class UiMainWindow(QMainWindow):
         self.ui_task_panel = self.ui_center_frame.frame_task_panel
         self.widget_task_panel = self.ui_center_frame.widget_task_panel
         self.widget_button_panel = self.ui_center_frame.widget_button_panel
+        self.canvas_tool = self.ui_center_frame.canvas_tool
+        self.canvas = self.ui_center_frame.canvas
+        self.label_marker = self.ui_center_frame.label_marker
+        self.view_info = self.ui_center_frame.view_info
         self.create_view_list_panel()
         # 创建状态栏
         self.status_bar = QStatusBar()

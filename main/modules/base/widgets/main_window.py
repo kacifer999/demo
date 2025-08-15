@@ -62,12 +62,6 @@ class MainWindow(UiMainWindow):
         self.action_project_panel.triggered.connect(self.project_panel.show_project_panel)
         # 显示/隐藏任务管理作
         self.action_task_panel.triggered.connect(self.task_panel.show_task_panel)
-    
-
-    def adjust_window_geometry(self):
-        self.ui_task_panel.hide()
-        self.ui_task_panel.showMaximized()
-        self.task_panel.build_task_panel()
 
 
     def build_project(self, project_name):
