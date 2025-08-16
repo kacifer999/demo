@@ -105,9 +105,10 @@ class Canvas(QWidget):
 
 
     def mousePressEvent(self, event):
-        if not self.image or self.image.isNull():return
+        if not self.image or self.image.isNull(): return
         self.set_mouse_pos(event.pos())
-        if event.button() == Qt.RightButton and self.mouse_pos == event.pos():
+        if self.mouse_pos != event.pos(): return
+        if event.button() == Qt.RightButton:
             self.is_dragging = True
             self.last_drag_pos = self.mouse_pos
             self.setCursor(Qt.ClosedHandCursor)

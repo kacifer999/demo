@@ -115,6 +115,7 @@ class ButtonPanel(QWidget):
         button.setIconSize(QSize(20, 20))
         button.setFocusPolicy(Qt.NoFocus)
         button.setToolTip(tooltip)
+        button.setCursor(Qt.PointingHandCursor)
         setattr(self, name, button)
         button.clicked.connect(lambda: self.on_button_clicked(button_name))
         self.layout().addWidget(button)

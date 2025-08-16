@@ -28,21 +28,26 @@ class LoadImagesThread(QThread):
             self.project_db = connect_db(Path(self.task.project_dir, 'project.db').as_posix())
             current_image_list = get_image_name_list()
             total = len(self.image_dir_list)
-            save_dir = Path(self.task.project_dir, 'images')
-            save_dir.mkdir(parents=True, exist_ok=True)
+            image_save_dir = Path(self.task.project_dir, 'images')
+            image_save_dir.mkdir(parents=True, exist_ok=True)
+            icon_save_dir = Path(self.task.project_dir, 'icons')
+            icon_save_dir.mkdir(parents=True, exist_ok=True)
             for index, image_file_dir in enumerate(self.image_dir_list):
                 image_name = Path(image_file_dir).stem
+                view_name = f'{image_name}_0'
                 if image_name in current_image_list: continue
                 image = Image.open(image_file_dir)
                 width, height = image.size
-                image.save(Path(save_dir, f'{image_name}.png'))
+                image.save(Path(image_save_dir, f'{image_name}.png'))
+                icon = image.resize([300, 300])
+                icon.save(Path(icon_save_dir, f'{view_name}.png'))
                 create_image_list.append(ImageModel(uuid=str(uuid.uuid1()),
                                                     image_name=image_name,
                                                     width=width,
                                                     height=height))
                 
                 create_view_list.append(ViewModel(uuid=str(uuid.uuid1()),
-                                                  view_name=f'{image_name}_0',
+                                                  view_name=view_name,
                                                   view_id=0,
                                                   image_name=image_name,
                                                   prev_task='input',

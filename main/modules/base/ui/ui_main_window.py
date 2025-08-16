@@ -2,11 +2,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from .ui_view_list import UiViewListPanel
 from main.modules.base.ui.ui_menubar import UiMenuBar
 from main.modules.base.ui.ui_project_panel import UiProjectPanel
 from main.modules.base.ui.ui_center_frame import UiCenterFrame
-from main.modules.base.ui.ui_view_list import UiViewListPanel
+from main.modules.base.widgets.view_list_panel import ViewListPanel
 
 
 class UiMainWindow(QMainWindow):
@@ -95,8 +94,8 @@ class UiMainWindow(QMainWindow):
 
         
     def create_view_list_panel(self):
-        self.ui_view_list = UiViewListPanel(self)
-        self.main_layout.addWidget(self.ui_view_list)
+        self.view_list_panel = ViewListPanel(self)
+        self.main_layout.addWidget(self.view_list_panel)
     
     
     def setup_widget_sizes(self):
