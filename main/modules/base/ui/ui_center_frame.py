@@ -6,6 +6,7 @@ from main.modules.base.widgets.button_panel import ButtonPanel
 from main.modules.base.widgets.canvas_tool_widget import CanvasToolWidget
 from main.modules.base.widgets.label_marker_widget import LabelMarkerWidget
 from main.modules.base.widgets.canvas import Canvas
+from main.modules.base.ui.ui_config_frame import UiConfigFrame
 
 
 class UiCenterFrame(QFrame):
@@ -119,15 +120,7 @@ class UiCenterFrame(QFrame):
         self.layout_label_train.addWidget(self.frame_label_tool)
 
     def create_config_panel(self):
-        # 创建配置面板框架
-        self.frame_config_panel = QFrame()
-        self.frame_config_panel.setFrameShape(QFrame.NoFrame)
-        self.frame_config_panel.setFrameShadow(QFrame.Plain)
-        self.frame_config_panel.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
-        self.frame_config_panel.setFixedWidth(400)
-        self.frame_config_panel.setStyleSheet("QFrame {border: 1px solid rgb(150, 150, 150); border-radius: 0px;}")
-
-        # 添加到布局
+        self.frame_config_panel = UiConfigFrame(self)
         self.layout_label_train.addWidget(self.frame_config_panel)
 
     def setup_sizes(self):

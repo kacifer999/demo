@@ -39,7 +39,7 @@ class ButtonPanel(QWidget):
         self.layout_buttons.addStretch()
         self.search_box = QLineEdit()
         self.search_box.setPlaceholderText("搜索图像名称...")
-        self.search_box.setFixedWidth(400)
+        self.search_box.setFixedWidth(500)
         self.search_box.setFixedHeight(30)
         self.search_box.setStyleSheet("QLineEdit {background: transparent; border: none;}")
         self.layout_buttons.addWidget(self.search_box)
