@@ -67,15 +67,17 @@ class UiMainWindow(QMainWindow):
         self.label_title.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         layout.addWidget(self.label_title)
         # 创建最小化和关闭按钮
-        self.button_minimize = QPushButton("-")
-        self.button_minimize.setFixedSize(23, 23)
-        self.button_minimize.clicked.connect(self.showMinimized)
-        layout.addWidget(self.button_minimize)
+        button_minimize = QPushButton("-")
+        button_minimize.setFocusPolicy(Qt.NoFocus)
+        button_minimize.setFixedSize(23, 23)
+        button_minimize.clicked.connect(self.showMinimized)
+        layout.addWidget(button_minimize)
         layout.addItem(QSpacerItem(5, 25, QSizePolicy.Fixed, QSizePolicy.Fixed))
-        self.button_close = QPushButton("×")
-        self.button_close.setFixedSize(23, 23)
-        self.button_close.clicked.connect(self.close)
-        layout.addWidget(self.button_close)
+        button_close = QPushButton("×")
+        button_close.setFocusPolicy(Qt.NoFocus)
+        button_close.setFixedSize(23, 23)
+        button_close.clicked.connect(self.close)
+        layout.addWidget(button_close)
 
         
     def create_menubar(self):
